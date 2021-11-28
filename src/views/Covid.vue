@@ -22,8 +22,8 @@
             </select>
         </div>
 
-        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="Math.random()"></BarChart>  <br><br>
-        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="Math.random()"></BarChart>
+        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="cases.datasets[0].data.toString()"></BarChart>  <br><br>
+        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="deaths.datasets[0].data.toString()"></BarChart>
 
         <br><br>
 
@@ -55,8 +55,11 @@ export default {
         }
     },
     watch: {
-        selectedState() {
-            this.getGraphs()
+        selectedState: {
+            immediate: true,
+            handler(){
+                this.getGraphs()
+            }
         },
         selectedTime() {
             this.getGraphs()
