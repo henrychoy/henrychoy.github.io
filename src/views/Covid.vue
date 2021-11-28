@@ -8,12 +8,17 @@
         
         
         <br><br>
-        
-        <!-- <CovidChart title="USA Covid Data by State" v-bind:list="states" item="State"></CovidChart> <br><br>
-        <CovidChart title="World Covid Data by Country" v-bind:list="countries" item="Country"></CovidChart> -->
 
-        <BarChart v-if="loaded" :chartdata="cases" :options="options"></BarChart>  <br><br>
-        <BarChart v-if="loaded" :chartdata="deaths" :options="options"></BarChart>
+        <div class="filters">
+            <label for="selectState">Filter by State:  </label>
+            <select name="selectState" id="selectState" v-model="selectedState">
+                <option v-for="state in stateDropdown" :key=state>{{state}}</option>
+            </select>
+            <br>
+        </div>
+
+        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key='Math.random()'></BarChart>  <br><br>
+        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key='Math.random()'></BarChart>
 
         <br><br>
 
@@ -38,13 +43,26 @@ export default {
         CovidGrid,
         BarChart,
     },
+    computed: {
+        graphURL() {
+            if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
+            else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
+        },
+    },
+    watch: {
+        selectedState() {
+            this.getGraphs()
+        }
+    },
     data() {
         return {
+            // data for dashboard and table
             states: [],
             countries: [],
             global: {},
             usa: {},
 
+            // data for graphs
             cases: {},
             deaths: {},
             loaded: false,
@@ -72,7 +90,10 @@ export default {
                         }
                     }],
                 }     
-            }
+            },
+            selectedState: "All States",
+            dropdownKey: 0,
+            stateDropdown: []
         }
     },
     async mounted () {
@@ -82,7 +103,7 @@ export default {
         fetch('https://disease.sh/v3/covid-19/states?yesterday=true')
             .then(res => res.json())
             .then(data => {
-                for(let i = data.length - 1; i > 0; i--){
+                for(let i = data.length - 1; i >= 0; i--){
                     if(data[i].state == 'Northern Mariana Islands' || 
                        data[i].state == 'American Samoa' ||
                        data[i].state == 'Grand Princess Ship' ||
@@ -98,7 +119,13 @@ export default {
                        data[i].state == 'Veteran Affairs'){
                     data.splice(i,1)
                     }
+                    else {
+                        this.stateDropdown.push(data[i].state)
+                    }
                 }
+                this.stateDropdown.sort()
+                this.stateDropdown.unshift("All States")
+
                 console.log(data)
                 this.states = data
             })
@@ -145,65 +172,79 @@ export default {
                 this.global.todayRecovered = this.global.todayRecovered.toLocaleString()
             })
         
-        // graph
-        // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
-        fetch('https://disease.sh/v3/covid-19/nyt/usa')
-            .then(res => res.json())
-            .then(data => {
-                // cases, minus total from the day before
-                for(let i = data.length - 1; i > 1; i--){
-                    if(data[i].cases > data[i - 1].cases) {
-                        data[i].cases = data[i].cases - data[i - 1].cases
+        console.log('graphURL = ', this.graphURL)
+        this.getGraphs()
+
+    },
+    methods: {
+        getGraphs() {
+            // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
+            fetch(this.graphURL)
+                .then(res => res.json())
+                .then(data => {
+                    // cases, minus total from the day before
+                    for(let i = data.length - 1; i > 1; i--){
+                        if(data[i].cases > data[i - 1].cases) {
+                            data[i].cases = data[i].cases - data[i - 1].cases
+                        }
+                        else{
+                            data[i].cases = 0
+                        }
                     }
-                    else{
-                        data[i].cases = 0
-                    }
+
+                    // deaths, minus total from the day before
+                    for(let i = data.length - 1; i > 1; i--){
+                        if(data[i].deaths > data[i - 1].deaths) {
+                            data[i].deaths = data[i].deaths - data[i - 1].deaths
+                        }
+                        else{
+                            data[i].deaths = 0
+                        }
+                    } 
+
+                    this.loaded = true
+                    this.chartData = data
+
+                const dates = data.map(d => d.date)
+                const cases = data.map(d => d.cases)
+                const deaths = data.map(d => d.deaths)
+
+                console.log('this.chartData = ', this.chartData)
+                console.log('this.cases = ', cases)
+                console.log('this.deaths = ', deaths)
+
+                this.cases = {
+                labels: dates,
+                datasets: [{
+                    label: `# of daily cases - ${this.selectedState}`,
+                    data: cases,
+                    backgroundColor: 'blue',
+                    }]
                 }
 
-                // deaths, minus total from the day before
-                for(let i = data.length - 1; i > 1; i--){
-                    if(data[i].deaths > data[i - 1].deaths) {
-                        data[i].deaths = data[i].deaths - data[i - 1].deaths
-                    }
-                    else{
-                        data[i].deaths = 0
-                    }
-                } 
+                this.deaths = {
+                labels: dates,
+                datasets: [{
+                    label: `# of daily deaths - ${this.selectedState}`,
+                    data: deaths,
+                    backgroundColor: 'red',
+                    }]
+                }
+            })
 
-                this.loaded = true
-                this.chartData = data
-                console.log('this.chartData = ', this.chartData)
-
-            const dates = data.map(d => d.date)
-            const cases = data.map(d => d.cases)
-            const deaths = data.map(d => d.deaths)
-
-            this.cases = {
-            labels: dates,
-            datasets: [{
-                label: '# of daily USA Cases',
-                data: cases,
-                backgroundColor: 'blue',
-                }]
-            }
-
-            this.deaths = {
-            labels: dates,
-            datasets: [{
-                label: '# of daily USA Deaths',
-                data: deaths,
-                backgroundColor: 'red',
-                }]
-            }
-        })
-
-
+            this.dropdownKey ++
+        }
     }
 
 }
 </script>
 
 <style>
-
+    select{
+        font-size: 100%;
+    }
+    .filters{
+        text-align: left;
+    }
 
 </style>
