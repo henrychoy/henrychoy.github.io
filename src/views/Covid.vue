@@ -22,8 +22,8 @@
             </select>
         </div>
 
-        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="cases.datasets[0].data.toString()"></BarChart>  <br><br>
-        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="deaths.datasets[0].data.toString()"></BarChart>
+        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="cases.datasets[0].label"></BarChart>  <br><br>
+        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="deaths.datasets[0].label"></BarChart>
 
         <br><br>
 
