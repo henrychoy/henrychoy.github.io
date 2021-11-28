@@ -15,10 +15,15 @@
                 <option v-for="state in stateDropdown" :key=state>{{state}}</option>
             </select>
             <br>
+
+            <label for="selectTime">Filter by Time:  </label>
+            <select name="selectTime" id="selectTime" v-model="selectedTime">
+                <option v-for="time in timeDropdown" :key=time>{{time}}</option>
+            </select>
         </div>
 
-        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key='Math.random()'></BarChart>  <br><br>
-        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key='Math.random()'></BarChart>
+        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="Math.random()"></BarChart>  <br><br>
+        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="Math.random()"></BarChart>
 
         <br><br>
 
@@ -47,10 +52,13 @@ export default {
         graphURL() {
             if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
             else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
-        },
+        }
     },
     watch: {
         selectedState() {
+            this.getGraphs()
+        },
+        selectedTime() {
             this.getGraphs()
         }
     },
@@ -92,8 +100,9 @@ export default {
                 }     
             },
             selectedState: "All States",
-            dropdownKey: 0,
-            stateDropdown: []
+            selectedTime: "All Time",
+            stateDropdown: [],
+            timeDropdown: ['All Time', "One Week", "30 Days"],
         }
     },
     async mounted () {
@@ -178,6 +187,7 @@ export default {
     },
     methods: {
         getGraphs() {
+            console.log('this.selectedState = ', this.selectedState)
             // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
             fetch(this.graphURL)
                 .then(res => res.json())
@@ -203,13 +213,14 @@ export default {
                     } 
 
                     this.loaded = true
-                    this.chartData = data
 
                 const dates = data.map(d => d.date)
                 const cases = data.map(d => d.cases)
                 const deaths = data.map(d => d.deaths)
 
-                console.log('this.chartData = ', this.chartData)
+                //if(this.selectedTime == 'All Time')
+
+                console.log('data = ', data)
                 console.log('this.cases = ', cases)
                 console.log('this.deaths = ', deaths)
 
@@ -231,8 +242,6 @@ export default {
                     }]
                 }
             })
-
-            this.dropdownKey ++
         }
     }
 
