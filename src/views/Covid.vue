@@ -223,10 +223,36 @@ export default {
                 let filteredCases = cases
                 let filteredDeaths = deaths
 
+                let movingAverageCases = []
+                let movingAverageDeaths = []
+                let movingAverageLabel = ""
+
                 if(this.selectedTime == 'All Time') {
                     filteredDates = dates
                     filteredCases = cases
                     filteredDeaths = deaths
+
+                    movingAverageCases = [0,0,0,0,0,0]
+                    movingAverageDeaths = [0,0,0,0,0,0]
+                    movingAverageLabel = "7 day avg"
+                    let sevenDayCases = filteredCases.slice(0,7)
+                    let sevenDayDeaths = filteredDeaths.slice(0,7)
+                    for(let x = 6; x < filteredCases.length; x++) {
+                        let sum = 0
+                        let sumDeaths = 0
+                        for(let y = 0; y < sevenDayCases.length; y++){
+                            sum += sevenDayCases[y]
+                            sumDeaths += sevenDayDeaths[y]
+                        }
+                        movingAverageCases.push(Math.floor(sum / 7))
+                        movingAverageDeaths.push(Math.floor(sumDeaths / 7))
+                        sevenDayCases.shift()
+                        sevenDayDeaths.shift()
+                        sevenDayCases.push(filteredCases[x + 1])
+                        sevenDayDeaths.push(filteredDeaths[x + 1])
+                    }
+                    console.log('filteredCases.length = ', filteredCases.length)
+                    console.log('movingAverage.length = ', movingAverageCases)
                 }
                 if(this.selectedTime == 'One Week') {
                     filteredDates = dates.slice(-7)
@@ -250,7 +276,6 @@ export default {
                 }
 
                 
-
                 console.log('data = ', data)
                 console.log('this.dates = ', filteredDates)
                 console.log('this.cases = ', filteredCases)
@@ -258,20 +283,41 @@ export default {
 
                 this.cases = {
                 labels: filteredDates,
-                datasets: [{
-                    label: `# of daily cases - ${this.selectedState} - ${this.selectedTime}`,
-                    data: filteredCases,
-                    backgroundColor: 'blue',
-                    }]
+                datasets: [
+                    {
+                        label: `Daily Cases - ${this.selectedState} - ${this.selectedTime}`,
+                        data: filteredCases,
+                        backgroundColor: 'rgb(40, 121, 237)',
+                    },
+                    {
+                        type: 'line',
+                        label: movingAverageLabel,
+                        data: movingAverageCases,
+                        borderColor: 'black',
+                        fill: false,
+                        pointRadius: 0
+                    }
+                    ]
                 }
 
                 this.deaths = {
                 labels: filteredDates,
-                datasets: [{
-                    label: `# of daily deaths - ${this.selectedState} - ${this.selectedTime}`,
-                    data: filteredDeaths,
-                    backgroundColor: 'red',
-                    }]
+                datasets: [
+                    {
+                        label: `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`,
+                        data: filteredDeaths,
+                        backgroundColor: 'rgb(222, 75, 62)',
+                    },
+                    {
+                        type: 'line',
+                        label: movingAverageLabel,
+                        data: movingAverageDeaths,
+                        borderColor: 'black',
+                        fill: false,
+                        pointRadius: 0
+                    }
+                    
+                    ]
                 }
             })
         }
