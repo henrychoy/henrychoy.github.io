@@ -55,11 +55,8 @@ export default {
         }
     },
     watch: {
-        selectedState: {
-            immediate: true,
-            handler(){
-                this.getGraphs()
-            }
+        selectedState() {
+            this.getGraphs()
         },
         selectedTime() {
             this.getGraphs()
@@ -78,10 +75,11 @@ export default {
             deaths: {},
             loaded: false,
             options: {
-                // title: {
-                //     display: true,
-                //     text: 'Covid Cases'
-                //     },
+                legend: {
+                    labels: {
+                        fontSize: 20
+                    }
+                },
                 responsive: true,
                 maintainAspectRatio: false,
                 layout: {
@@ -105,7 +103,7 @@ export default {
             selectedState: "All States",
             selectedTime: "All Time",
             stateDropdown: [],
-            timeDropdown: ['All Time', "One Week", "30 Days"],
+            timeDropdown: ['All Time', "One Week", "One Month", "Six Months", "One Year"],
         }
     },
     async mounted () {
@@ -217,30 +215,61 @@ export default {
 
                     this.loaded = true
 
-                const dates = data.map(d => d.date)
-                const cases = data.map(d => d.cases)
-                const deaths = data.map(d => d.deaths)
+                let dates = data.map(d => d.date)
+                let cases = data.map(d => d.cases)
+                let deaths = data.map(d => d.deaths)
 
-                //if(this.selectedTime == 'All Time')
+                let filteredDates = dates
+                let filteredCases = cases
+                let filteredDeaths = deaths
+
+                if(this.selectedTime == 'All Time') {
+                    filteredDates = dates
+                    filteredCases = cases
+                    filteredDeaths = deaths
+                }
+                if(this.selectedTime == 'One Week') {
+                    filteredDates = dates.slice(-7)
+                    filteredCases = cases.slice(-7)
+                    filteredDeaths = deaths.slice(-7)
+                }
+                if(this.selectedTime == 'One Month') {
+                    filteredDates = dates.slice(-30)
+                    filteredCases = cases.slice(-30)
+                    filteredDeaths = deaths.slice(-30)
+                }
+                if(this.selectedTime == 'Six Months') {
+                    filteredDates = dates.slice(-180)
+                    filteredCases = cases.slice(-180)
+                    filteredDeaths = deaths.slice(-180)
+                }
+                if(this.selectedTime == 'One Year') {
+                    filteredDates = dates.slice(-365)
+                    filteredCases = cases.slice(-365)
+                    filteredDeaths = deaths.slice(-365)
+                }
+
+                
 
                 console.log('data = ', data)
-                console.log('this.cases = ', cases)
-                console.log('this.deaths = ', deaths)
+                console.log('this.dates = ', filteredDates)
+                console.log('this.cases = ', filteredCases)
+                console.log('this.deaths = ', filteredDeaths)
 
                 this.cases = {
-                labels: dates,
+                labels: filteredDates,
                 datasets: [{
-                    label: `# of daily cases - ${this.selectedState}`,
-                    data: cases,
+                    label: `# of daily cases - ${this.selectedState} - ${this.selectedTime}`,
+                    data: filteredCases,
                     backgroundColor: 'blue',
                     }]
                 }
 
                 this.deaths = {
-                labels: dates,
+                labels: filteredDates,
                 datasets: [{
-                    label: `# of daily deaths - ${this.selectedState}`,
-                    data: deaths,
+                    label: `# of daily deaths - ${this.selectedState} - ${this.selectedTime}`,
+                    data: filteredDeaths,
                     backgroundColor: 'red',
                     }]
                 }
