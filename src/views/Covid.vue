@@ -109,7 +109,7 @@ export default {
     async mounted () {
         this.loaded = false
 
-        // states
+        // states table data
         fetch('https://disease.sh/v3/covid-19/states?yesterday=true')
             .then(res => res.json())
             .then(data => {
@@ -136,23 +136,17 @@ export default {
                 this.stateDropdown.sort()
                 this.stateDropdown.unshift("All States")
 
-                console.log(data)
+                //console.log('state table data = ', data)
                 this.states = data
             })
 
-        // countries
+        // countries grid data
         fetch('https://disease.sh/v3/covid-19/countries?yesterday=true&sort=cases')
             .then(res => res.json())
             .then(data => {
                 
                 this.countries = data
                 this.usa = data[0]
-                // this.usa.cases = this.usa.cases
-                // this.usa.todayCases = this.usa.todayCases
-                // this.usa.deaths = this.usa.deaths
-                // this.usa.todayDeaths = this.usa.todayDeaths
-                // this.usa.recovered = this.usa.recovered
-                // this.usa.todayRecovered = this.usa.todayRecovered
 
                 this.usa.casesGrid = this.usa.cases.toLocaleString()
                 this.usa.todayCasesGrid = this.usa.todayCases.toLocaleString()
@@ -164,15 +158,14 @@ export default {
                 for(let i = 0; i < this.countries.length; i++){
                     this.countries[i].state = this.countries[i].country
                 }
-                console.log(this.usa)
+                //console.log('usa grid data = ', this.usa)
             })
             
 
-        // global
+        // global grid data
         fetch('https://disease.sh/v3/covid-19/all')
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 this.global = data
                 this.global.cases = this.global.cases.toLocaleString()
                 this.global.todayCases = this.global.todayCases.toLocaleString()
@@ -180,15 +173,15 @@ export default {
                 this.global.todayDeaths = this.global.todayDeaths.toLocaleString()
                 this.global.recovered = this.global.recovered.toLocaleString()
                 this.global.todayRecovered = this.global.todayRecovered.toLocaleString()
+
+                //console.log('global grid data = ', data)
             })
         
-        console.log('graphURL = ', this.graphURL)
         this.getGraphs()
 
     },
     methods: {
         getGraphs() {
-            console.log('this.selectedState = ', this.selectedState)
             // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
             fetch(this.graphURL)
                 .then(res => res.json())
@@ -262,10 +255,10 @@ export default {
                 }
 
                 
-                console.log('data = ', data)
-                console.log('this.dates = ', filteredDates)
-                console.log('this.cases = ', filteredCases)
-                console.log('this.deaths = ', filteredDeaths)
+                console.log('state or usa data = ', data)
+                console.log('filteredDates = ', filteredDates)
+                console.log('filteredCases = ', filteredCases)
+                console.log('filteredDeaths = ', filteredDeaths)
 
                 this.cases = {
                 labels: filteredDates,
@@ -316,8 +309,6 @@ export default {
                 movingAverageCases.push(null)
                 movingAverageDeaths.push(null)
             }
-            console.log('movingAverageCases = ', movingAverageCases)
-            console.log('movingAverageDeaths = ', movingAverageDeaths)
 
             let slidingWindowCases = cases.slice(0,days)
             let slidingWindowDeaths = deaths.slice(0,days)
