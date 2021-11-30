@@ -90,7 +90,9 @@ export default {
                 scales: {
                     yAxes: [{
                         ticks: {
-                            beginAtZero:true
+                            beginAtZero:true,
+                            
+
                         }
                     }],
                     xAxes: [{
@@ -217,6 +219,7 @@ export default {
                 let filteredDeaths = deaths
 
                 let movingAverages = []
+                let radius = 0
 
                 if(this.selectedTime == 'All Time') {
                     filteredDates = dates
@@ -226,39 +229,48 @@ export default {
                     movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
                 }
                 if(this.selectedTime == 'One Week') {
+                    radius = 5
                     filteredDates = dates.slice(-7)
-                    filteredCases = cases.slice(-7)
-                    filteredDeaths = deaths.slice(-7)
-
-                    movingAverages = this.calculateMovingAverage(2, filteredCases, filteredDeaths)
-                }
-                if(this.selectedTime == 'One Month') {
-                    filteredDates = dates.slice(-30)
-                    filteredCases = cases.slice(-30)
-                    filteredDeaths = deaths.slice(-30)
+                    filteredCases = cases.slice(-13)    // grab 6 prior days to calc 7 day avg
+                    filteredDeaths = deaths.slice(-13)
 
                     movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
+                    filteredCases = cases.slice(-7)     // grab days needed for graph
+                    filteredDeaths = deaths.slice(-7)
+                }
+                if(this.selectedTime == 'One Month') {
+                    radius = 5
+                    filteredDates = dates.slice(-30)
+                    filteredCases = cases.slice(-36)    // grab 6 prior days to calc 7 day avg
+                    filteredDeaths = deaths.slice(-36)
+
+                    movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
+                    filteredCases = cases.slice(-30)     // grab days needed for graph
+                    filteredDeaths = deaths.slice(-30)
                 }
                 if(this.selectedTime == 'Six Months') {
                     filteredDates = dates.slice(-180)
-                    filteredCases = cases.slice(-180)
-                    filteredDeaths = deaths.slice(-180)
+                    filteredCases = cases.slice(-186)    // grab 6 prior days to calc 7 day avg
+                    filteredDeaths = deaths.slice(-186)
 
                     movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
+                    filteredCases = cases.slice(-180)     // grab days needed for graph
+                    filteredDeaths = deaths.slice(-180)
                 }
                 if(this.selectedTime == 'One Year') {
                     filteredDates = dates.slice(-365)
-                    filteredCases = cases.slice(-365)
-                    filteredDeaths = deaths.slice(-365)
+                    filteredCases = cases.slice(-371)    // grab 6 prior days to calc 7 day avg
+                    filteredDeaths = deaths.slice(-371)
 
                     movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
+                    filteredCases = cases.slice(-365)     // grab days needed for graph
+                    filteredDeaths = deaths.slice(-365)
                 }
 
-                
-                console.log('state or usa data = ', data)
-                console.log('filteredDates = ', filteredDates)
-                console.log('filteredCases = ', filteredCases)
-                console.log('filteredDeaths = ', filteredDeaths)
+                // console.log('state or usa data = ', data)
+                // console.log('filteredDates = ', filteredDates)
+                // console.log('filteredCases = ', filteredCases)
+                // console.log('filteredDeaths = ', filteredDeaths)
 
                 this.cases = {
                 labels: filteredDates,
@@ -267,6 +279,7 @@ export default {
                         label: `Daily Cases - ${this.selectedState} - ${this.selectedTime}`,
                         data: filteredCases,
                         backgroundColor: 'rgb(40, 121, 237)',
+                        order: 2
                     },
                     {
                         type: 'line',
@@ -274,7 +287,8 @@ export default {
                         data: movingAverages[0],
                         borderColor: 'black',
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: radius,
+                        order: 1
                     }
                     ]
                 }
@@ -286,6 +300,7 @@ export default {
                         label: `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`,
                         data: filteredDeaths,
                         backgroundColor: 'rgb(222, 75, 62)',
+                        order: 2
                     },
                     {
                         type: 'line',
@@ -293,7 +308,8 @@ export default {
                         data: movingAverages[1],
                         borderColor: 'black',
                         fill: false,
-                        pointRadius: 0
+                        pointRadius: radius,
+                        order: 1
                     }
                     
                     ]
@@ -304,30 +320,36 @@ export default {
             
             let movingAverageCases = []
             let movingAverageDeaths = []
+            let endingPoint = cases.length
 
-            for(let i = 0; i < days - 1; i++) {
-                movingAverageCases.push(null)
-                movingAverageDeaths.push(null)
+            if(this.selectedTime == "All Time") {
+                for(let i = 0; i < days - 1; i++) {
+                    movingAverageCases.push(0)
+                    movingAverageDeaths.push(0)
+                }
+            }
+            else {
+                endingPoint = cases.length - days + 1
             }
 
             let slidingWindowCases = cases.slice(0,days)
             let slidingWindowDeaths = deaths.slice(0,days)
 
-            for(let x = (days - 1); x < cases.length; x++) {
+            for(let x = 0; x < endingPoint; x++) {
                 let sumCases = 0
                 let sumDeaths = 0
                 for(let y = 0; y < slidingWindowCases.length; y++){
                     sumCases += slidingWindowCases[y]
                     sumDeaths += slidingWindowDeaths[y]
                 }
-                movingAverageCases.push(Math.floor(sumCases / days))
-                movingAverageDeaths.push(Math.floor(sumDeaths / days))
+                movingAverageCases.push(Math.round(sumCases / days))
+                movingAverageDeaths.push(Math.round(sumDeaths / days))
 
                 slidingWindowCases.shift()
                 slidingWindowDeaths.shift()
 
-                slidingWindowCases.push(cases[x + 1])
-                slidingWindowDeaths.push(deaths[x + 1])
+                slidingWindowCases.push(cases[x + days])
+                slidingWindowDeaths.push(deaths[x + days])
             }
 
             return [movingAverageCases, movingAverageDeaths]
