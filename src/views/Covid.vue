@@ -223,56 +223,42 @@ export default {
                 let filteredCases = cases
                 let filteredDeaths = deaths
 
-                let movingAverageCases = []
-                let movingAverageDeaths = []
-                let movingAverageLabel = ""
+                let movingAverages = []
 
                 if(this.selectedTime == 'All Time') {
                     filteredDates = dates
                     filteredCases = cases
                     filteredDeaths = deaths
 
-                    movingAverageCases = [0,0,0,0,0,0]
-                    movingAverageDeaths = [0,0,0,0,0,0]
-                    movingAverageLabel = "7 day avg"
-                    let sevenDayCases = filteredCases.slice(0,7)
-                    let sevenDayDeaths = filteredDeaths.slice(0,7)
-                    for(let x = 6; x < filteredCases.length; x++) {
-                        let sum = 0
-                        let sumDeaths = 0
-                        for(let y = 0; y < sevenDayCases.length; y++){
-                            sum += sevenDayCases[y]
-                            sumDeaths += sevenDayDeaths[y]
-                        }
-                        movingAverageCases.push(Math.floor(sum / 7))
-                        movingAverageDeaths.push(Math.floor(sumDeaths / 7))
-                        sevenDayCases.shift()
-                        sevenDayDeaths.shift()
-                        sevenDayCases.push(filteredCases[x + 1])
-                        sevenDayDeaths.push(filteredDeaths[x + 1])
-                    }
-                    console.log('filteredCases.length = ', filteredCases.length)
-                    console.log('movingAverage.length = ', movingAverageCases)
+                    movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
                 }
                 if(this.selectedTime == 'One Week') {
                     filteredDates = dates.slice(-7)
                     filteredCases = cases.slice(-7)
                     filteredDeaths = deaths.slice(-7)
+
+                    movingAverages = this.calculateMovingAverage(2, filteredCases, filteredDeaths)
                 }
                 if(this.selectedTime == 'One Month') {
                     filteredDates = dates.slice(-30)
                     filteredCases = cases.slice(-30)
                     filteredDeaths = deaths.slice(-30)
+
+                    movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
                 }
                 if(this.selectedTime == 'Six Months') {
                     filteredDates = dates.slice(-180)
                     filteredCases = cases.slice(-180)
                     filteredDeaths = deaths.slice(-180)
+
+                    movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
                 }
                 if(this.selectedTime == 'One Year') {
                     filteredDates = dates.slice(-365)
                     filteredCases = cases.slice(-365)
                     filteredDeaths = deaths.slice(-365)
+
+                    movingAverages = this.calculateMovingAverage(7, filteredCases, filteredDeaths)
                 }
 
                 
@@ -291,8 +277,8 @@ export default {
                     },
                     {
                         type: 'line',
-                        label: movingAverageLabel,
-                        data: movingAverageCases,
+                        label: 'Moving Avg',
+                        data: movingAverages[0],
                         borderColor: 'black',
                         fill: false,
                         pointRadius: 0
@@ -310,8 +296,8 @@ export default {
                     },
                     {
                         type: 'line',
-                        label: movingAverageLabel,
-                        data: movingAverageDeaths,
+                        label: "Moving Avg",
+                        data: movingAverages[1],
                         borderColor: 'black',
                         fill: false,
                         pointRadius: 0
@@ -320,6 +306,41 @@ export default {
                     ]
                 }
             })
+        },
+        calculateMovingAverage(days, cases, deaths) {
+            
+            let movingAverageCases = []
+            let movingAverageDeaths = []
+
+            for(let i = 0; i < days - 1; i++) {
+                movingAverageCases.push(null)
+                movingAverageDeaths.push(null)
+            }
+            console.log('movingAverageCases = ', movingAverageCases)
+            console.log('movingAverageDeaths = ', movingAverageDeaths)
+
+            let slidingWindowCases = cases.slice(0,days)
+            let slidingWindowDeaths = deaths.slice(0,days)
+
+            for(let x = (days - 1); x < cases.length; x++) {
+                let sumCases = 0
+                let sumDeaths = 0
+                for(let y = 0; y < slidingWindowCases.length; y++){
+                    sumCases += slidingWindowCases[y]
+                    sumDeaths += slidingWindowDeaths[y]
+                }
+                movingAverageCases.push(Math.floor(sumCases / days))
+                movingAverageDeaths.push(Math.floor(sumDeaths / days))
+
+                slidingWindowCases.shift()
+                slidingWindowDeaths.shift()
+
+                slidingWindowCases.push(cases[x + 1])
+                slidingWindowDeaths.push(deaths[x + 1])
+            }
+
+            return [movingAverageCases, movingAverageDeaths]
+
         }
     }
 
