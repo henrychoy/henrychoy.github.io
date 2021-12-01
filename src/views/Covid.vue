@@ -6,7 +6,6 @@
         <div class="gridContainer">
             <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global"></covidGrid>
         
-        
         <br><br>
 
         <div class="filters">
@@ -15,24 +14,19 @@
                 <option v-for="country in countryDropdown" :key=country>{{country}}</option>
             </select>
             
-            &emsp;&emsp;
-            
-            <span :style="{opacity: this.selectedCountry == 'USA' ? '1' : '0'}">
+            <div :style="{opacity: this.selectedCountry == 'USA' ? '1' : '0'}">
                 <label for="selectState">Filter State:  </label>
                 <select name="selectState" id="selectState" v-model="selectedState">
                     <option v-for="state in stateDropdown" :key=state>{{state}}</option>
                 </select>
-            </span>
+            </div>
 
-            &emsp;&emsp;&emsp;&emsp;
-
-            <label for="selectTime">Filter Time:  </label>
+            <label for="selectTime">Filter Time: </label>  
             <select name="selectTime" id="selectTime" v-model="selectedTime">
                 <option v-for="time in timeDropdown" :key=time>{{time}}</option>
             </select>
 
             <div id="error" :style="{'opacity':error?1:0}">Country not found or doesn't have any historical data</div>
-
 
         </div>
 
@@ -426,12 +420,12 @@ export default {
     }
     .filters{
         text-align: left;
+        line-height: 1.5em;
     }
 
     #error{
     color: red;
     margin-top: 5px;
     font-weight: bold;
-    padding-bottom: .5em;
     }
 </style>
