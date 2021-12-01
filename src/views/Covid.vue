@@ -341,11 +341,12 @@ export default {
 
                 let labelKey = {}
                 if(this.error) {
-                    console.log('errorrrrrrrrrrrrrrrrrrrrrrrrrrrr')
                     labelKey.cases = `Daily Cases - ERROR: No data found`
                     labelKey.deaths = `Daily Deaths - ERROR: No data found`
+                    movingAverages = []
+
                 }
-                else if(this.selectedCountry !== "USA"){
+                else if(this.selectedCountry !== "USA" && !this.error){
                     labelKey.cases = `Daily Cases - ${this.selectedCountry} - ${this.selectedTime}`
                     labelKey.deaths = `Daily Deaths - ${this.selectedCountry} - ${this.selectedTime}`
                 }
@@ -353,7 +354,7 @@ export default {
                     labelKey.cases = `Daily Cases - ${this.selectedState} - ${this.selectedTime}`
                     labelKey.deaths = `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`
                 }
-
+                
                 this.cases = {
                 labels: filteredDates,
                 datasets: [
@@ -367,7 +368,7 @@ export default {
                         type: 'line',
                         label: 'Moving Avg',
                         data: movingAverages[0],
-                        borderColor: 'black',
+                        borderColor: 'rgb(0, 0, 0, .5)',
                         fill: false,
                         pointRadius: radius,
                         order: 1
@@ -388,7 +389,7 @@ export default {
                         type: 'line',
                         label: "Moving Avg",
                         data: movingAverages[1],
-                        borderColor: 'black',
+                        borderColor: 'rgb(0, 0, 0, .5)',
                         fill: false,
                         pointRadius: radius,
                         order: 1
@@ -437,16 +438,21 @@ export default {
             return [movingAverageCases, movingAverageDeaths]
         },
         transformCountryData(data) {
-            console.log('data to transform = ', data)
-            let casesObj = data.timeline.cases
-            let deathsObj = data.timeline.deaths
-            let array = []
-            Object.keys(casesObj).forEach(function(key) {
-                array.push({date: key, cases: casesObj[key], deaths: deathsObj[key]})
-            });
+            try {
+                console.log('data to transform = ', data)
+                let casesObj = data.timeline.cases
+                let deathsObj = data.timeline.deaths
+                let array = []
+                Object.keys(casesObj).forEach(function(key) {
+                    array.push({date: key, cases: casesObj[key], deaths: deathsObj[key]})
+                });
 
-            console.log('transformed data = ', array)
-            return array
+                console.log('transformed data = ', array)
+                return array
+            }
+            catch {
+                return []
+            }
         }
     }
 
