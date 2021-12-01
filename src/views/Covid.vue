@@ -4,7 +4,7 @@
         <h1>Covid Tracker</h1>
 
         <div class="gridContainer">
-            <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global"></covidGrid>
+            <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global" :key="Math.random()"></covidGrid>
         
         <br><br>
 
@@ -177,7 +177,7 @@ export default {
                     this.countryDropdown.push(this.countries[i].country)
                     this.countries[i].state = this.countries[i].country
                 }
-                //console.log('usa grid data = ', this.usa)
+                console.log('usa grid data = ', this.usa)
             })
             
 
@@ -194,6 +194,45 @@ export default {
                 this.global.todayRecovered = this.global.todayRecovered.toLocaleString()
 
                 //console.log('global grid data = ', data)
+            })
+        
+        // global vax grid data
+        fetch('https://disease.sh/v3/covid-19/vaccine/coverage?lastdays=5')
+            .then(res => res.json())
+            .then(data => {
+                let array = []
+                Object.keys(data).forEach(key => {
+                    array.push({date: key, totalVaxed: data[key]})
+                })
+                for(let i = array.length - 1; i > 0; i--){
+                    if(array[i].totalVaxed - array[i - 1].totalVaxed > 0){
+                        array[4].newVaxed = array[i].totalVaxed - array[i - 1].totalVaxed
+                        break
+                    }
+                }
+                console.log('Global vax = ', array)
+                this.global.totalVaxed = array[4].totalVaxed.toLocaleString()
+                this.global.newVaxed = array[4].newVaxed.toLocaleString()
+            })
+        
+        // USA vax grid data
+        fetch('https://disease.sh/v3/covid-19/vaccine/coverage/countries/USA?lastdays=5')
+            .then(res => res.json())
+            .then(data => {
+                data = data.timeline
+                let array = []
+                Object.keys(data).forEach(key => {
+                    array.push({date: key, totalVaxed: data[key]})
+                })
+                for(let i = array.length - 1; i > 0; i--){
+                    if(array[i].totalVaxed - array[i - 1].totalVaxed > 0){
+                        array[4].newVaxed = array[i].totalVaxed - array[i - 1].totalVaxed
+                        break
+                    }
+                }
+                console.log('USA vax = ', array)
+                this.usa.totalVaxed = array[4].totalVaxed.toLocaleString()
+                this.usa.newVaxed = array[4].newVaxed.toLocaleString()
             })
         
         this.getGraphs()

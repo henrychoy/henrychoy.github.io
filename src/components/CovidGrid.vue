@@ -21,15 +21,15 @@
             </div>
 
             <div class="card">
-                <b>Total Recovered</b> <br>
+                <b>Total Vax Doses</b> <br>
                 <div class="recovered">
-                {{usa.recoveredGrid}} <br>
-                +{{usa.todayRecoveredGrid}} <br>
+                {{usa.totalVaxed}} <br>
+                +{{usa.newVaxed}} <br>
                 </div>
             </div>
         </section>
 
-        <br>
+        
 
         <h3>
             <img class="covidIcon" src="https://img.icons8.com/color/48/000000/globe--v1.png"/> Global
@@ -51,10 +51,10 @@
             </div>
 
             <div class="card">
-                <b>Total Recovered</b> <br>
+                <b>Total Vax Doses</b> <br>
                 <div class="recovered">
-                {{global.recovered}} <br>
-                +{{global.todayRecovered}} <br>
+                {{global.totalVaxed}} <br>
+                +{{global.newVaxed}} <br>
                 </div>
             </div>
         </section>
