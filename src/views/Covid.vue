@@ -10,16 +10,30 @@
         <br><br>
 
         <div class="filters">
-            <label for="selectState">Filter by State:  </label>
-            <select name="selectState" id="selectState" v-model="selectedState">
-                <option v-for="state in stateDropdown" :key=state>{{state}}</option>
+            <label for="selectCountry">Filter Country:  </label>
+            <select name="selectCountry" id="selectCountry" v-model="selectedCountry">
+                <option v-for="country in countryDropdown" :key=country>{{country}}</option>
             </select>
-            <br>
+            
+            &emsp;&emsp;
+            
+            <span :style="{opacity: this.selectedCountry == 'USA' ? '1' : '0'}">
+                <label for="selectState">Filter State:  </label>
+                <select name="selectState" id="selectState" v-model="selectedState">
+                    <option v-for="state in stateDropdown" :key=state>{{state}}</option>
+                </select>
+            </span>
 
-            <label for="selectTime">Filter by Time:  </label>
+            &emsp;&emsp;&emsp;&emsp;
+
+            <label for="selectTime">Filter Time:  </label>
             <select name="selectTime" id="selectTime" v-model="selectedTime">
                 <option v-for="time in timeDropdown" :key=time>{{time}}</option>
             </select>
+
+            <div id="error" :style="{'opacity':error?1:0}">Country not found or doesn't have any historical data</div>
+
+
         </div>
 
         <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="cases.datasets[0].label"></BarChart>  <br><br>
@@ -50,11 +64,15 @@ export default {
     },
     computed: {
         graphURL() {
-            if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
+            if(this.selectedCountry !== "USA") return `https://disease.sh/v3/covid-19/historical/${this.selectedCountry}?lastdays=all`
+            else if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
             else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
         }
     },
     watch: {
+        selectedCountry() {
+            this.getGraphs()
+        },
         selectedState() {
             this.getGraphs()
         },
@@ -102,10 +120,13 @@ export default {
                     }],
                 }     
             },
+            selectedCountry: "USA",
             selectedState: "All States",
             selectedTime: "All Time",
+            countryDropdown: [],
             stateDropdown: [],
             timeDropdown: ['All Time', "One Week", "One Month", "Six Months", "One Year"],
+            error: false
         }
     },
     async mounted () {
@@ -148,6 +169,7 @@ export default {
             .then(data => {
                 
                 this.countries = data
+                console.log('this.countries = ', this.countries)
                 this.usa = data[0]
 
                 this.usa.casesGrid = this.usa.cases.toLocaleString()
@@ -158,6 +180,7 @@ export default {
                 this.usa.todayRecoveredGrid = this.usa.todayRecovered.toLocaleString()
 
                 for(let i = 0; i < this.countries.length; i++){
+                    this.countryDropdown.push(this.countries[i].country)
                     this.countries[i].state = this.countries[i].country
                 }
                 //console.log('usa grid data = ', this.usa)
@@ -188,6 +211,17 @@ export default {
             fetch(this.graphURL)
                 .then(res => res.json())
                 .then(data => {
+                    if(data.message) {
+                        this.error = true
+                    }
+                    else{
+                        this.error = false
+                    }
+                    if(this.selectedCountry !== "USA"){
+                        let transformedData = this.transformCountryData(data)
+                        data = transformedData
+                    }
+
                     // cases, minus total from the day before
                     for(let i = data.length - 1; i > 1; i--){
                         if(data[i].cases > data[i - 1].cases) {
@@ -207,7 +241,7 @@ export default {
                             data[i].deaths = 0
                         }
                     } 
-
+                    console.log('graphData = ', data)
                     this.loaded = true
 
                 let dates = data.map(d => d.date)
@@ -272,11 +306,26 @@ export default {
                 // console.log('filteredCases = ', filteredCases)
                 // console.log('filteredDeaths = ', filteredDeaths)
 
+                let labelKey = {}
+                if(this.error) {
+                    console.log('errorrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+                    labelKey.cases = `Daily Cases - ERROR: No data found`
+                    labelKey.deaths = `Daily Deaths - ERROR: No data found`
+                }
+                else if(this.selectedCountry !== "USA"){
+                    labelKey.cases = `Daily Cases - ${this.selectedCountry} - ${this.selectedTime}`
+                    labelKey.deaths = `Daily Deaths - ${this.selectedCountry} - ${this.selectedTime}`
+                }
+                else{
+                    labelKey.cases = `Daily Cases - ${this.selectedState} - ${this.selectedTime}`
+                    labelKey.deaths = `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`
+                }
+
                 this.cases = {
                 labels: filteredDates,
                 datasets: [
                     {
-                        label: `Daily Cases - ${this.selectedState} - ${this.selectedTime}`,
+                        label: labelKey.cases,
                         data: filteredCases,
                         backgroundColor: 'rgb(40, 121, 237)',
                         order: 2
@@ -297,7 +346,7 @@ export default {
                 labels: filteredDates,
                 datasets: [
                     {
-                        label: `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`,
+                        label: labelKey.deaths,
                         data: filteredDeaths,
                         backgroundColor: 'rgb(222, 75, 62)',
                         order: 2
@@ -353,7 +402,18 @@ export default {
             }
 
             return [movingAverageCases, movingAverageDeaths]
+        },
+        transformCountryData(data) {
+            console.log('data to transform = ', data)
+            let casesObj = data.timeline.cases
+            let deathsObj = data.timeline.deaths
+            let array = []
+            Object.keys(casesObj).forEach(function(key) {
+                array.push({date: key, cases: casesObj[key], deaths: deathsObj[key]})
+            });
 
+            console.log('transformed data = ', array)
+            return array
         }
     }
 
@@ -368,4 +428,10 @@ export default {
         text-align: left;
     }
 
+    #error{
+    color: red;
+    margin-top: 5px;
+    font-weight: bold;
+    padding-bottom: .5em;
+    }
 </style>
