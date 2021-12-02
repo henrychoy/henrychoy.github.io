@@ -23,8 +23,8 @@
             <div class="card">
                 <b>Total Vax Doses</b> <br>
                 <div class="recovered">
-                {{usa.totalVaxed}} <br>
-                +{{usa.newVaxed}} <br>
+                {{vaxData.usaTotal}} <br>
+                +{{vaxData.usaNew}} <br>
                 </div>
             </div>
         </section>
@@ -53,8 +53,8 @@
             <div class="card">
                 <b>Total Vax Doses</b> <br>
                 <div class="recovered">
-                {{global.totalVaxed}} <br>
-                +{{global.newVaxed}} <br>
+                {{vaxData.globalTotal}} <br>
+                +{{vaxData.globalNew}} <br>
                 </div>
             </div>
         </section>
@@ -64,7 +64,7 @@
 
 <script>
 export default {
-    props: ['usa', 'global'],
+    props: ['usa', 'global', 'vaxData'],
 
 }
 </script>

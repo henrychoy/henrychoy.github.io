@@ -4,7 +4,7 @@
         <h1>Covid Tracker</h1>
 
         <div class="gridContainer">
-            <covidGrid v-if="vaxLoaded" class="gridContainer" v-bind:usa="usa" v-bind:global="global"></covidGrid>
+            <covidGrid class="gridContainer" :usa="usa" :global="global" :vaxData="vaxData" :key="vaxKey"></covidGrid>
         </div>
 
         <br><br>
@@ -62,10 +62,6 @@ export default {
             if(this.selectedCountry !== "USA") return `https://disease.sh/v3/covid-19/historical/${this.selectedCountry}?lastdays=all`
             else if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
             else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
-        },
-        vaxLoaded() {
-            if(this.usaVaxLoaded && this.globalVaxLoaded) return true
-            else return false
         }
     },
     watch: {
@@ -81,13 +77,13 @@ export default {
     },
     data() {
         return {
-            // data for dashboard and table
+            // data for grid and table
             states: [],
             countries: [],
             global: {},
             usa: {},
-            usaVaxLoaded: false,
-            globalVaxLoaded: false,
+            vaxData: {},
+            vaxKey: 0,
 
             // data for graphs
             cases: {},
@@ -218,9 +214,9 @@ export default {
                     }
                 }
                 console.log('Global vax = ', array)
-                this.global.totalVaxed = array[4].totalVaxed.toLocaleString()
-                this.global.newVaxed = array[4].newVaxed.toLocaleString()
-                this.globalVaxLoaded = true
+                this.vaxData.globalTotal = array[4].totalVaxed.toLocaleString()
+                this.vaxData.globalNew = array[4].newVaxed.toLocaleString()
+                this.vaxKey ++
             })
         
         // USA vax grid data
@@ -239,11 +235,11 @@ export default {
                     }
                 }
                 console.log('USA vax = ', array)
-                this.usa.totalVaxed = array[4].totalVaxed.toLocaleString()
-                this.usa.newVaxed = array[4].newVaxed.toLocaleString()
-                this.usaVaxLoaded = true
+                this.vaxData.usaTotal = array[4].totalVaxed.toLocaleString()
+                this.vaxData.usaNew = array[4].newVaxed.toLocaleString()
+                this.vaxKey ++
             })
-        
+        console.log('vaxData = ', this.vaxData)
         this.getGraphs()
 
     },
