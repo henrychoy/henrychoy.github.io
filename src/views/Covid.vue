@@ -4,7 +4,7 @@
         <h1>Covid Tracker</h1>
 
         <div class="gridContainer">
-            <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global" :key="componentKey"></covidGrid>
+            <covidGrid v-if="vaxLoaded" class="gridContainer" v-bind:usa="usa" v-bind:global="global"></covidGrid>
         </div>
 
         <br><br>
@@ -62,6 +62,10 @@ export default {
             if(this.selectedCountry !== "USA") return `https://disease.sh/v3/covid-19/historical/${this.selectedCountry}?lastdays=all`
             else if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
             else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
+        },
+        vaxLoaded() {
+            if(this.usaVaxLoaded && this.globalVaxLoaded) return true
+            else return false
         }
     },
     watch: {
@@ -82,7 +86,8 @@ export default {
             countries: [],
             global: {},
             usa: {},
-            componentKey: 0,
+            usaVaxLoaded: false,
+            globalVaxLoaded: false,
 
             // data for graphs
             cases: {},
@@ -215,7 +220,7 @@ export default {
                 console.log('Global vax = ', array)
                 this.global.totalVaxed = array[4].totalVaxed.toLocaleString()
                 this.global.newVaxed = array[4].newVaxed.toLocaleString()
-                this.forceRender()
+                this.globalVaxLoaded = true
             })
         
         // USA vax grid data
@@ -236,16 +241,13 @@ export default {
                 console.log('USA vax = ', array)
                 this.usa.totalVaxed = array[4].totalVaxed.toLocaleString()
                 this.usa.newVaxed = array[4].newVaxed.toLocaleString()
-                this.forceRender()
+                this.usaVaxLoaded = true
             })
         
         this.getGraphs()
 
     },
     methods: {
-        forceRender() {
-            this.componentKey ++
-        },
         getGraphs() {
             // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
             fetch(this.graphURL)
