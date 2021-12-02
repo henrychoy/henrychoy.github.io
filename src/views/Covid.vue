@@ -4,8 +4,9 @@
         <h1>Covid Tracker</h1>
 
         <div class="gridContainer">
-            <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global" :key="Math.random()"></covidGrid>
-        
+            <covidGrid class="gridContainer" v-bind:usa="usa" v-bind:global="global" :key="componentKey"></covidGrid>
+        </div>
+
         <br><br>
 
         <div class="filters">
@@ -16,7 +17,7 @@
             
             <div :style="{opacity: this.selectedCountry == 'USA' ? '1' : '0'}">
                 <label for="selectState">Filter State:  </label>
-                <select name="selectState" id="selectState" v-model="selectedState">
+                <select name="selectState" id="selectState" v-if="this.selectedCountry == 'USA'" v-model="selectedState">
                     <option v-for="state in stateDropdown" :key=state>{{state}}</option>
                 </select>
             </div>
@@ -37,7 +38,7 @@
 
         <CovidTable title="USA Covid Data by State" v-bind:list="states" item="State"></CovidTable> <br><br>
         <CovidTable title="World Covid Data by Country" v-bind:list="countries" item="Country"></CovidTable>
-        </div>
+        
     </div>
 
 </template>
@@ -81,6 +82,7 @@ export default {
             countries: [],
             global: {},
             usa: {},
+            componentKey: 0,
 
             // data for graphs
             cases: {},
@@ -213,6 +215,7 @@ export default {
                 console.log('Global vax = ', array)
                 this.global.totalVaxed = array[4].totalVaxed.toLocaleString()
                 this.global.newVaxed = array[4].newVaxed.toLocaleString()
+                this.forceRender()
             })
         
         // USA vax grid data
@@ -233,12 +236,16 @@ export default {
                 console.log('USA vax = ', array)
                 this.usa.totalVaxed = array[4].totalVaxed.toLocaleString()
                 this.usa.newVaxed = array[4].newVaxed.toLocaleString()
+                this.forceRender()
             })
         
         this.getGraphs()
 
     },
     methods: {
+        forceRender() {
+            this.componentKey ++
+        },
         getGraphs() {
             // https://henry-cors-server.herokuapp.com/https://covidtracking.com/api/us/daily
             fetch(this.graphURL)
@@ -469,8 +476,8 @@ export default {
     }
 
     #error{
-    color: red;
-    margin-top: 5px;
-    font-weight: bold;
+        color: red;
+        margin-top: 5px;
+        font-weight: bold;
     }
 </style>
