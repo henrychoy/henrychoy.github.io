@@ -16,13 +16,13 @@
             </select>
             
             <div :style="{opacity: this.selectedCountry == 'USA' ? '1' : '0'}">
-                <label for="selectState">Filter State:  </label>
+                <label for="selectState">Filter State: </label>
                 <select name="selectState" id="selectState" v-if="this.selectedCountry == 'USA'" v-model="selectedState">
                     <option v-for="state in stateDropdown" :key=state>{{state}}</option>
                 </select>
             </div>
 
-            <label for="selectTime">Filter Time: </label>  
+            <label for="selectTime">Filter Time: </label>
             <select name="selectTime" id="selectTime" v-model="selectedTime">
                 <option v-for="time in timeDropdown" :key=time>{{time}}</option>
             </select>
@@ -31,8 +31,8 @@
 
         </div>
 
-        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="cases.datasets[0].label"></BarChart>  <br><br>
-        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="deaths.datasets[0].label"></BarChart>
+        <BarChart v-if="loaded" :chartdata="cases" :options="options" :key="graphKey.cases"></BarChart>  <br><br>
+        <BarChart v-if="loaded" :chartdata="deaths" :options="options" :key="graphKey.deaths"></BarChart>
 
         <br><br>
 
@@ -90,10 +90,14 @@ export default {
             deaths: {},
             loaded: false,
             options: {
+                tooltips: {
+                    mode: 'x-axis'
+                },
                 legend: {
                     labels: {
-                        fontSize: 20
-                    }
+                        fontSize: 18
+                    },
+                    reverse: true
                 },
                 responsive: true,
                 maintainAspectRatio: false,
@@ -123,7 +127,8 @@ export default {
             countryDropdown: [],
             stateDropdown: [],
             timeDropdown: ['All Time', "One Week", "One Month", "Six Months", "One Year"],
-            error: false
+            error: false,
+            graphKey: {}
         }
     },
     async mounted () {
@@ -228,8 +233,9 @@ export default {
                 Object.keys(data).forEach(key => {
                     array.push({date: key, totalVaxed: data[key]})
                 })
+                array[4].newVaxed = 0
                 for(let i = array.length - 1; i > 0; i--){
-                    if(array[i].totalVaxed - array[i - 1].totalVaxed > 0){
+                    if(array[i].totalVaxed - array[i - 1].totalVaxed > 1000){
                         array[4].newVaxed = array[i].totalVaxed - array[i - 1].totalVaxed
                         break
                     }
@@ -344,27 +350,26 @@ export default {
                 // console.log('filteredCases = ', filteredCases)
                 // console.log('filteredDeaths = ', filteredDeaths)
 
-                let labelKey = {}
+                
                 if(this.error) {
-                    labelKey.cases = `Daily Cases - ERROR: No data found`
-                    labelKey.deaths = `Daily Deaths - ERROR: No data found`
-                    movingAverages = []
-
+                    this.graphKey.cases = `Daily Cases - ERROR: No data found`
+                    this.graphKey.deaths = `Daily Deaths - ERROR: No data found`
+                    movingAverages = {}
                 }
                 else if(this.selectedCountry !== "USA" && !this.error){
-                    labelKey.cases = `Daily Cases - ${this.selectedCountry} - ${this.selectedTime}`
-                    labelKey.deaths = `Daily Deaths - ${this.selectedCountry} - ${this.selectedTime}`
+                    this.graphKey.cases = `Daily Cases - ${this.selectedCountry} - ${this.selectedTime}`
+                    this.graphKey.deaths = `Daily Deaths - ${this.selectedCountry} - ${this.selectedTime}`
                 }
                 else{
-                    labelKey.cases = `Daily Cases - ${this.selectedState} - ${this.selectedTime}`
-                    labelKey.deaths = `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`
+                    this.graphKey.cases = `Daily Cases - ${this.selectedState} - ${this.selectedTime}`
+                    this.graphKey.deaths = `Daily Deaths - ${this.selectedState} - ${this.selectedTime}`
                 }
                 
                 this.cases = {
                 labels: filteredDates,
                 datasets: [
                     {
-                        label: labelKey.cases,
+                        label: 'Daily Cases',
                         data: filteredCases,
                         backgroundColor: 'rgb(40, 121, 237)',
                         order: 2
@@ -372,7 +377,7 @@ export default {
                     {
                         type: 'line',
                         label: 'Moving Avg',
-                        data: movingAverages[0],
+                        data: movingAverages.cases,
                         borderColor: 'rgb(0, 0, 0, .5)',
                         fill: false,
                         pointRadius: radius,
@@ -385,7 +390,7 @@ export default {
                 labels: filteredDates,
                 datasets: [
                     {
-                        label: labelKey.deaths,
+                        label: 'Daily Deaths',
                         data: filteredDeaths,
                         backgroundColor: 'rgb(222, 75, 62)',
                         order: 2
@@ -393,7 +398,7 @@ export default {
                     {
                         type: 'line',
                         label: "Moving Avg",
-                        data: movingAverages[1],
+                        data: movingAverages.deaths,
                         borderColor: 'rgb(0, 0, 0, .5)',
                         fill: false,
                         pointRadius: radius,
@@ -440,7 +445,7 @@ export default {
                 slidingWindowDeaths.push(deaths[x + days])
             }
 
-            return [movingAverageCases, movingAverageDeaths]
+            return {cases: movingAverageCases, deaths: movingAverageDeaths}
         },
         transformCountryData(data) {
             try {
@@ -467,6 +472,7 @@ export default {
 <style>
     select{
         font-size: 100%;
+        max-width: 200px;
     }
     .filters{
         text-align: left;
