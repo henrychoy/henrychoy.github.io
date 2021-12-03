@@ -203,7 +203,7 @@ export default {
                 this.global.recovered = this.global.recovered.toLocaleString()
                 this.global.todayRecovered = this.global.todayRecovered.toLocaleString()
 
-                //console.log('global grid data = ', data)
+                console.log('global grid data = ', data)
             })
         
         // global vax grid data
@@ -380,7 +380,7 @@ export default {
                         type: 'line',
                         label: 'Moving Avg',
                         data: movingAverages.cases,
-                        borderColor: 'rgb(0, 0, 0, .5)',
+                        borderColor: 'rgb(0, 0, 0, .4)',
                         fill: false,
                         pointRadius: radius,
                         order: 1
@@ -401,7 +401,7 @@ export default {
                         type: 'line',
                         label: "Moving Avg",
                         data: movingAverages.deaths,
-                        borderColor: 'rgb(0, 0, 0, .5)',
+                        borderColor: 'rgb(0, 0, 0, .4)',
                         fill: false,
                         pointRadius: radius,
                         order: 1
