@@ -7,7 +7,7 @@
             <covidGrid class="gridContainer" :usa="usa" :global="global" :vaxData="vaxData" :key="vaxKey"></covidGrid>
         </div>
 
-        <br><br>
+        <br>
 
         <div class="filters">
             <label for="selectCountry">Filter Country:  </label>
@@ -59,7 +59,8 @@ export default {
     },
     computed: {
         graphURL() {
-            if(this.selectedCountry !== "USA") return `https://disease.sh/v3/covid-19/historical/${this.selectedCountry}?lastdays=all`
+            if(this.selectedCountry == "All Countries") return `https://disease.sh/v3/covid-19/historical/all?lastdays=all`
+            else if(this.selectedCountry !== "USA") return `https://disease.sh/v3/covid-19/historical/${this.selectedCountry}?lastdays=all`
             else if(this.selectedState == "All States") return "https://disease.sh/v3/covid-19/nyt/usa"
             else return `https://disease.sh/v3/covid-19/nyt/states/${this.selectedState}?lastdays=all`
         }
@@ -95,7 +96,7 @@ export default {
                 },
                 legend: {
                     labels: {
-                        fontSize: 18
+                        fontSize: 15
                     },
                     reverse: true
                 },
@@ -185,6 +186,7 @@ export default {
                     this.countryDropdown.push(this.countries[i].country)
                     this.countries[i].state = this.countries[i].country
                 }
+                this.countryDropdown.unshift("All Countries")
                 console.log('usa grid data = ', this.usa)
             })
             
@@ -261,7 +263,7 @@ export default {
                     else{
                         this.error = false
                     }
-                    if(this.selectedCountry !== "USA"){
+                    if(this.selectedCountry !== "USA" || this.selectedCountry == "All Countries"){
                         let transformedData = this.transformCountryData(data)
                         data = transformedData
                     }
@@ -450,8 +452,19 @@ export default {
         transformCountryData(data) {
             try {
                 console.log('data to transform = ', data)
-                let casesObj = data.timeline.cases
-                let deathsObj = data.timeline.deaths
+
+                let casesObj = {}
+                let deathsObj = {}
+
+                if(this.selectedCountry !== "All Countries"){
+                    casesObj = data.timeline.cases
+                    deathsObj = data.timeline.deaths
+                }
+                else if(this.selectedCountry == "All Countries"){
+                    casesObj = data.cases
+                    deathsObj = data.deaths
+                }
+
                 let array = []
                 Object.keys(casesObj).forEach(function(key) {
                     array.push({date: key, cases: casesObj[key], deaths: deathsObj[key]})
@@ -459,6 +472,9 @@ export default {
 
                 console.log('transformed data = ', array)
                 return array
+
+
+
             }
             catch {
                 return []
