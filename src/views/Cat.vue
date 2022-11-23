@@ -8,7 +8,7 @@
         density="compact"
         variant="outlined"
         class="container d-inline-flex"
-        prepend-inner-icon="fa-solid fa-cat"
+        :prepend-inner-icon="icon"
       />
       <v-btn v-if="false" variant="outlined" color="secondary" class="mb-3" append-icon="fa-solid fa-gear" @click="dialog = true">Settings</v-btn>
     </h1>
@@ -53,6 +53,12 @@ export default {
       if (this.selected === 'Dog') return 'https://henry-cors-server.herokuapp.com/https://dog-facts-api.herokuapp.com/api/v1/resources/dogs?number=1'
       return 'https://meowfacts.herokuapp.com/'
     },
+    icon() {
+      if (this.selected === 'Cat') return 'fa-solid fa-cat'
+      if (this.selected === 'Dog') return 'fa-solid fa-dog'
+      if (this.selected === 'Fox') return 'fa-brands fa-firefox-browser'
+      return 'fa-solid fa-cat'
+    }
   },
   watch: {
     selected() {
