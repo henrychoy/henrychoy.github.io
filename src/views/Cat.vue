@@ -45,28 +45,27 @@ export default {
     endpoint() {
       if (this.selected === 'Cat') return 'https://cataas.com/cat?json=true'
       if (this.selected === 'Dog') return 'https://random.dog/woof.json'
-      if (this.selected === 'Fox') return 'https://randomfox.ca/floof/'
-      return 'https://cataas.com/cat?json=true'
+      return 'https://randomfox.ca/floof/'
     },
     factEndpoint() {
       if (this.selected === 'Cat') return 'https://meowfacts.herokuapp.com/'
-      if (this.selected === 'Dog') return 'https://henry-cors-server.herokuapp.com/https://dog-facts-api.herokuapp.com/api/v1/resources/dogs?number=1'
-      return 'https://meowfacts.herokuapp.com/'
+      return 'https://dog-api.kinduff.com/api/facts'
     },
     icon() {
       if (this.selected === 'Cat') return 'fa-solid fa-cat'
       if (this.selected === 'Dog') return 'fa-solid fa-dog'
-      if (this.selected === 'Fox') return 'fa-brands fa-firefox-browser'
-      return 'fa-solid fa-cat'
+      return 'fa-brands fa-firefox-browser'
     }
   },
   watch: {
     selected() {
       this.getCat()
       this.getFact()
+      localStorage.setItem('animal', JSON.stringify(this.selected))
     }
   },
   mounted() {
+    this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
     this.getCat()
     this.getFact()
   },
@@ -92,7 +91,7 @@ export default {
       .then(res => res.json())
       .then(data => {
         console.log(data)
-        this.fact = this.selected === 'Cat' ? data.data[0] : data[0].fact
+        this.fact = this.selected === 'Cat' ? data.data[0] : data.facts[0]
       })
       .catch(err => {
           console.warn(err)

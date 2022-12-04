@@ -51,6 +51,7 @@
     },
     mounted() {
       this.items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      console.log('localstorage = ', localStorage)
     },
     methods: {
       submit(event) {

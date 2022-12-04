@@ -41,16 +41,19 @@
 
     return {
       theme,
-      toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+      toggleTheme: () => {
+        theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+        localStorage.setItem('theme', theme.global.name.value);
+      }
     }
     },
     data: () => ({
       drawer: false,
     }),
+    mounted() {
+      this.theme.global.name.value = localStorage.getItem('theme') || 'dark';
+    },
     methods: {
-      print() {
-        console.log(this.$vuetify.theme.defaultTheme)
-      },
     }
   }
 </script>
