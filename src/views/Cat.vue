@@ -43,7 +43,7 @@ export default {
   }),
   computed: {
     endpoint() {
-      if (this.selected === 'Cat') return 'https://cataas.com/cat?json=true'
+      if (this.selected === 'Cat') return 'https://api.thecatapi.com/v1/images/search'
       if (this.selected === 'Dog') return 'https://random.dog/woof.json'
       return 'https://randomfox.ca/floof/'
     },
@@ -76,6 +76,7 @@ export default {
       fetch(this.endpoint)
       .then(res => res.json())
       .then(data => {
+        console.log('image data = ', data);
         if ( this.selected === 'Dog' && data.url.includes( '.mp4' ) ) {
 				  this.getCat();
 			  }
@@ -90,7 +91,7 @@ export default {
       fetch(this.factEndpoint)
       .then(res => res.json())
       .then(data => {
-        console.log(data)
+        console.log('fact data = ', data)
         this.fact = this.selected === 'Cat' ? data.data[0] : data.facts[0]
       })
       .catch(err => {
@@ -98,7 +99,7 @@ export default {
       })
     },
     getImgURL(data) {
-      if (this.selected === 'Cat') return `https://cataas.com/${data.url}`
+      if (this.selected === 'Cat') return data[0].url
       if (this.selected === 'Dog') return data.url
       if (this.selected === 'Fox') return data.image
     },
