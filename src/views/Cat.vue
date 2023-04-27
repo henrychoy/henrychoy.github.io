@@ -22,7 +22,7 @@
     />
     <p v-if="loading">Generating {{ selected }}, please stand by...</p>
     <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="getCat(); getFact()" @load="loading=false">
-    <p v-show="!loading && selected !== 'Fox'" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
+    <p v-show="!loading && selected !== 'Fox' && selected !== 'Bird'" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
   </div>
   <PicsDialog :dialog="dialog" @submit="dialog=false" />
 </template>
@@ -38,13 +38,14 @@ export default {
     loading: true,
     fact: '',
     dialog: false,
-    animals: ['Cat', 'Dog', 'Fox'],
+    animals: ['Cat', 'Dog', 'Fox', 'Bird'],
     selected: 'Cat'
   }),
   computed: {
     endpoint() {
       if (this.selected === 'Cat') return 'https://api.thecatapi.com/v1/images/search'
       if (this.selected === 'Dog') return 'https://random.dog/woof.json'
+      if (this.selected === 'Bird') return 'https://shibe.online/api/birds'
       return 'https://randomfox.ca/floof/'
     },
     factEndpoint() {
@@ -54,6 +55,7 @@ export default {
     icon() {
       if (this.selected === 'Cat') return 'fa-solid fa-cat'
       if (this.selected === 'Dog') return 'fa-solid fa-dog'
+      if (this.selected === 'Bird') return 'fa-solid fa-dove'
       return 'fa-brands fa-firefox-browser'
     }
   },
@@ -87,7 +89,7 @@ export default {
       })
     },
     getFact() {
-      if (this.selected === 'Fox') return
+      if (this.selected === 'Fox' || this.selected === 'Bird') return
       fetch(this.factEndpoint)
       .then(res => res.json())
       .then(data => {
@@ -99,9 +101,11 @@ export default {
       })
     },
     getImgURL(data) {
+      console.log('data = ', data)
       if (this.selected === 'Cat') return data[0].url
       if (this.selected === 'Dog') return data.url
       if (this.selected === 'Fox') return data.image
+      if (this.selected === 'Bird') return data[0]
     },
   }
 }
