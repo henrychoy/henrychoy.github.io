@@ -21,10 +21,29 @@
       class="mt-15 mb-3"
     />
     <p v-if="loading">Generating {{ selected }}, please stand by...</p>
-    <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="getCat(); getFact()" @load="loading=false">
-    <p v-show="!loading && selected !== 'Fox' && selected !== 'Bird'" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
+    <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="clearQueryStrings(); getCat(); getFact()" @load="loading=false">
+    <p v-show="!loading && selected !== 'Fox' && selected !== 'Bird' && !queryStringsProvided" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
   </div>
   <PicsDialog :dialog="dialog" @submit="dialog=false" />
+  <v-container class="mt-5">
+    <v-text-field 
+      v-model="shareURL"
+      label="Send this URL to share this image"
+      variant="outlined"
+      :readonly="true"
+      @focus="$event.target.select()"
+    >
+      <template #append-inner>
+        <v-icon
+          icon="fa-solid fa-copy"
+          @click="copyURL"
+        />
+      </template>
+    </v-text-field>
+  </v-container>
+  <v-snackbar v-model="copyToast" :timeout="1000" color="green">
+    Copy Successful!
+  </v-snackbar>
 </template>
 
 <script>
@@ -39,7 +58,8 @@ export default {
     fact: '',
     dialog: false,
     animals: ['Cat', 'Dog', 'Fox', 'Bird'],
-    selected: 'Cat'
+    selected: 'Cat',
+    copyToast: false,
   }),
   computed: {
     endpoint() {
@@ -57,32 +77,49 @@ export default {
       if (this.selected === 'Dog') return 'fa-solid fa-dog'
       if (this.selected === 'Bird') return 'fa-solid fa-dove'
       return 'fa-brands fa-firefox-browser'
+    },
+    shareURL() {
+      return `https://www.henrychoy.com/cat?animal=${this.selected}&img=${this.image}`
+    },
+    queryStringsProvided() {
+      return (this.$route.query.animal !== undefined && this.$route.query.img !== undefined)
     }
   },
   watch: {
     selected() {
+      console.log('q string = ', this.queryStringsProvided)
       this.getCat()
-      this.getFact()
+      if (!this.queryStringsProvided) {
+        this.getFact()
+      }
       localStorage.setItem('animal', JSON.stringify(this.selected))
     }
   },
   mounted() {
-    this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
-    this.getCat()
-    this.getFact()
+    if (this.queryStringsProvided) {
+      console.log('this.$route.query.animal = ', this.$route.query.animal);
+      console.log('this.$route.query.img = ', this.$route.query.img);
+      // this.selected = this.$route.query.animal
+      this.image = this.$route.query.img
+    } else {
+      this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
+      this.getCat()
+      this.getFact()
+    }
   },
   methods: {
     getCat() {
+      console.log('getCat running!!!!!!!!')
       this.image = null
       this.loading = true
       fetch(this.endpoint)
       .then(res => res.json())
       .then(data => {
-        console.log('image data = ', data);
         if ( this.selected === 'Dog' && data.url.includes( '.mp4' ) ) {
 				  this.getCat();
 			  }
         this.image = this.getImgURL(data)
+        console.log('image = ', this.image)
       })
       .catch(err => {
           console.warn(err)
@@ -93,7 +130,6 @@ export default {
       fetch(this.factEndpoint)
       .then(res => res.json())
       .then(data => {
-        console.log('fact data = ', data)
         this.fact = this.selected === 'Cat' ? data.data[0] : data.facts[0]
       })
       .catch(err => {
@@ -101,12 +137,21 @@ export default {
       })
     },
     getImgURL(data) {
-      console.log('data = ', data)
       if (this.selected === 'Cat') return data[0].url
       if (this.selected === 'Dog') return data.url
       if (this.selected === 'Fox') return data.image
       if (this.selected === 'Bird') return data[0]
     },
+    copyURL() {
+      navigator.clipboard.writeText(this.shareURL);
+      this.copyToast = true
+    },
+    clearQueryStrings() {
+      if (this.queryStringsProvided) {
+        window.location.href = window.location.href.split('?')[0]
+        // this.$router.push('/cat')
+      }
+    }
   }
 }
 </script>
