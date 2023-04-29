@@ -25,6 +25,7 @@
         <v-list-item to="/" prepend-icon="fa-solid fa-house" title="Home" />
         <v-list-item to="/cat" prepend-icon="fa-solid fa-cat" title="Cats" />
         <v-list-item to="/todo" prepend-icon="fa-solid fa-list-check" title="ToDo" />
+        <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" />
       </v-list>
     </v-navigation-drawer>
     <br><br><br>
