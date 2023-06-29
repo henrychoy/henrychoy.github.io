@@ -70,7 +70,8 @@ export default {
     },
     factEndpoint() {
       if (this.selected === 'Cat') return 'https://meowfacts.herokuapp.com/'
-      return 'https://dog-api.kinduff.com/api/facts'
+      if (this.selected === 'Dog') return 'https://dogapi.dog/api/v2/facts'
+      return ''
     },
     icon() {
       if (this.selected === 'Cat') return 'fa-solid fa-cat'
@@ -87,7 +88,6 @@ export default {
   },
   watch: {
     selected() {
-      console.log('q string = ', this.queryStringsProvided)
       this.getCat()
       if (!this.queryStringsProvided) {
         this.getFact()
@@ -109,7 +109,6 @@ export default {
   },
   methods: {
     getCat() {
-      console.log('getCat running!!!!!!!!')
       this.image = null
       this.loading = true
       fetch(this.endpoint)
@@ -130,7 +129,7 @@ export default {
       fetch(this.factEndpoint)
       .then(res => res.json())
       .then(data => {
-        this.fact = this.selected === 'Cat' ? data.data[0] : data.facts[0]
+        this.fact = this.selected === 'Cat' ? data.data[0] : data.data[0].attributes.body
       })
       .catch(err => {
           console.warn(err)
