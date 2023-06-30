@@ -10,7 +10,6 @@
         class="container d-inline-flex"
         :prepend-inner-icon="icon"
       />
-      <v-btn v-if="false" variant="outlined" color="secondary" class="mb-3" append-icon="fa-solid fa-gear" @click="dialog = true">Settings</v-btn>
     </h1>
     <v-progress-circular
       v-if="loading"
@@ -24,7 +23,6 @@
     <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="clearQueryStrings(); getCat(); getFact()" @load="loading=false">
     <p v-show="!loading && selected !== 'Fox' && selected !== 'Bird' && !queryStringsProvided" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
   </div>
-  <PicsDialog :dialog="dialog" @submit="dialog=false" />
   <v-container class="mt-5">
     <v-text-field 
       v-model="shareURL"
@@ -47,16 +45,13 @@
 </template>
 
 <script>
-import PicsDialog from '@/dialogs/PicsDialog.vue'
 
 export default {
   name: 'Cat',
-  components: { PicsDialog },
   data: () => ({
     image: null,
     loading: true,
     fact: '',
-    dialog: false,
     animals: ['Cat', 'Dog', 'Fox', 'Bird'],
     selected: 'Cat',
     copyToast: false,

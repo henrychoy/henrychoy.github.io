@@ -1,7 +1,7 @@
 <template>
   <v-form class="px-5">
     <v-row>
-      <v-text-field v-model="task" label="Task" density="compact" @keydown.enter="submit" />
+      <v-text-field v-model="task" label="Enter Task..." density="compact" @keydown.enter="submit" />
       <v-btn :disabled="task.trim().length === 0" @click="submit">Add Task</v-btn>
     </v-row>
     <v-list>
