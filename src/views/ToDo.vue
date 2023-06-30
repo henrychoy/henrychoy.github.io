@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  var STORAGE_KEY = 'todo-storage';
+  const STORAGE_KEY = 'todo-storage';
   export default {
     data: () => ({
       task: '',

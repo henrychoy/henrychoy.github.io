@@ -67,6 +67,8 @@ import { Doughnut, Pie, Bar } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title, BarElement, CategoryScale, LinearScale } from 'chart.js'
 ChartJS.register(ArcElement, Tooltip, Legend, Title, BarElement, CategoryScale, LinearScale)
 
+const STORAGE_KEY = 'chart-storage';
+
 export default {
   name: 'Charts',
   components: { VDataTable, AddItemDialog, Doughnut, Pie, Bar },
@@ -120,6 +122,17 @@ export default {
         }]
       }
     },
+  },
+  watch: {
+    items: {
+      handler(newVal) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal));
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   },
   methods: {
     addItem(item) {
