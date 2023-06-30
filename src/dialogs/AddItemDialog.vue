@@ -11,7 +11,7 @@
           density="compact"
         />
         <v-card-text>
-          <v-form @submit.prevent>
+          <v-form ref="form" @submit.prevent>
             <v-text-field
               v-model="category"
               :rules="rules"
@@ -22,7 +22,7 @@
               :rules="rulesNumerical"
               label="Value"
             />
-            <v-btn type="submit" block class="mt-2" @click="showDialog=false; $emit('submit', { category, value });">Submit</v-btn>
+            <v-btn type="submit" block class="mt-2" @click="submitForm(category, value)">Submit</v-btn>
           </v-form>
         </v-card-text>
         <!-- <v-card-actions class="justify-end">
@@ -39,7 +39,7 @@
     props: {
       dialog: Boolean
     },
-    emits: ['submit'],
+    emits: ['submit', 'close'],
     data() {
       return {
         category: '',
@@ -68,6 +68,17 @@
           this.$emit('submit', dialog)
         }
       }
+    },
+    methods: {
+      async submitForm(category, value) {
+        const { valid } = await this.$refs.form.validate()
+
+        if (valid) {
+          this.$emit('submit', { category, value });
+          this.$refs.form.reset()
+          this.$emit('close', true);
+        }
+      },
     }
   }
 </script>

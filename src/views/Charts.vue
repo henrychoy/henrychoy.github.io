@@ -7,7 +7,6 @@
       </v-btn>
     </v-row>
     <v-row>
-      {{items}}
       <v-data-table
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
@@ -18,7 +17,7 @@
       />  
     </v-row>
   </v-container>
-  <AddItemDialog :dialog="dialog" @submit="dialog=false; addItem($event)" />
+  <AddItemDialog :dialog="dialog" @submit="addItem($event)" @close="dialog = false" />
 </template>
 <script>
 import { VDataTable } from 'vuetify/labs/VDataTable'
@@ -34,11 +33,13 @@ export default {
       headers: [
         {
           title: 'Category',
-          key: 'category'
+          key: 'category',
+          align: 'start'
         },
         {
           title: 'Value',
-          key: 'value'
+          key: 'value',
+          align: 'start'
         }
       ],
       items: []
@@ -49,8 +50,7 @@ export default {
       console.log('item = ', item)
       this.items.push({
         category: item.category,
-        value: item.value,
-        align: 'start'
+        value: item.value
       })
     }
   }
