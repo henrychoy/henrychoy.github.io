@@ -48,9 +48,12 @@
         :headers="headers"
         :items="items"
         item-value="name"
-        class="elevation-1"
+        class="elevation-1 text-left"
         density="compact"
       >
+        <template #[`item.percent`]="{ item }">
+          <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
+        </template>
         <template #[`item.actions`]="{ item }">
           <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
           <v-icon @click="deleteItem(item.index)" class="ml-3">fa-regular fa-trash-can</v-icon>
@@ -88,6 +91,11 @@ export default {
           title: 'Value',
           key: 'value',
           align: 'start'
+        },
+        {
+          title: 'Percent',
+          key: 'percent',
+          align: 'start',
         },
         {
           title: '',
@@ -138,6 +146,9 @@ export default {
         })
       })
       return transformedData
+    },
+    total() {
+      return this.items.reduce((total, item) => total + item.value, 0)
     }
   },
   watch: {
@@ -181,7 +192,8 @@ export default {
 </script>
 
 <style>
-  .align-middle {
-  vertical-align: middle;
+ .v-table > .v-table__wrapper > table > tbody > tr > td, .v-table > .v-table__wrapper > table > tbody > tr > th, .v-table > .v-table__wrapper > table > thead > tr > td, .v-table > .v-table__wrapper > table > thead > tr > th, .v-table > .v-table__wrapper > table > tfoot > tr > td, .v-table > .v-table__wrapper > table > tfoot > tr > th {
+    padding-left: 6px;
+    padding-right: 0;
   }
 </style>
