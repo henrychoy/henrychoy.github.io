@@ -177,13 +177,18 @@ export default {
       this.items.splice(index, 1)
     },
     loadExample() {
+      // https://www.ramseysolutions.com/budgeting/american-average-monthly-expenses#:~:text=There%20are%20folks%20at%20the,income%20of%20%2478%2C743%20after%20taxes.
       this.items = this.items.concat([
-        {category: 'Rent', value: 1000},
-        {category: 'Food', value: 180},
-        {category: 'Utilities', value: 80},
-        {category: 'Internet', value: 100},
-        {category: 'Car Gas', value: 160},
-        {category: 'Misc', value: 60},
+        {category: 'Housing', value: 1885},
+        {category: 'Transportation', value: 913},
+        {category: 'Food', value: 691},
+        {category: 'Insurance', value: 656},
+        {category: 'Healthcare', value: 454},
+        {category: 'Entertainment', value: 297},
+        {category: 'Other', value: 234},
+        {category: 'Charity', value: 201},
+        {category: 'Clothes', value: 146},
+        {category: 'Education', value: 102},
       ])
       console.log('items = ', this.items);
     }
