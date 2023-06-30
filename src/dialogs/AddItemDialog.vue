@@ -3,11 +3,13 @@
     <v-dialog
       v-model="showDialog"
       max-width="90%"
+      @click:outside="$emit('close', true);"
+      @keydown.escape="$emit('close', true);"
     >
       <v-card>
         <v-toolbar
           color="primary"
-          title="Add Item"
+          :title="Object.keys(edit).length === 0 ? 'Add Item' : 'Edit Item'"
           density="compact"
         />
         <v-card-text>
@@ -22,7 +24,7 @@
               :rules="rulesNumerical"
               label="Value"
             />
-            <v-btn type="submit" block class="mt-2" @click="submitForm(category, value)">Submit</v-btn>
+            <v-btn type="submit" block class="mt-2" @click="submitForm(category, value, index)">Submit</v-btn>
           </v-form>
         </v-card-text>
         <!-- <v-card-actions class="justify-end">
@@ -37,9 +39,13 @@
   export default {
     name: 'AddItemDialog',
     props: {
-      dialog: Boolean
+      dialog: Boolean,
+      edit: {
+        type: Object,
+        default: () => {}
+      }
     },
-    emits: ['submit', 'close'],
+    emits: ['submit', 'close', 'editItem'],
     data() {
       return {
         category: '',
@@ -64,17 +70,26 @@
           return this.dialog
         },
         set (dialog) {
-          console.log(dialog)
-          this.$emit('submit', dialog)
+          this.$emit('close', true)
         }
+      },
+      index() {
+        return Object.keys(this.edit).length === 0 ? null : this.edit.index
       }
     },
+    updated() {
+      this.category = Object.keys(this.edit).length > 0 ? this.edit.columns.category : ''
+      this.value = Object.keys(this.edit).length > 0 ? this.edit.columns.value : ''
+    },
     methods: {
-      async submitForm(category, value) {
+      async submitForm(category, value, index) {
         const { valid } = await this.$refs.form.validate()
-
         if (valid) {
-          this.$emit('submit', { category, value });
+          if(Object.keys(this.edit).length === 0) {
+            this.$emit('submit', { category, value });
+          } else {
+            this.$emit('editItem', { category, value, index });
+          }
           this.$refs.form.reset()
           this.$emit('close', true);
         }
