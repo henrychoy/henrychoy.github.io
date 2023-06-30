@@ -24,7 +24,7 @@
       </v-window-item>
       <v-window-item value="Bar">
         <Bar
-          :data="chartData"
+          :data="barChartData"
         />
       </v-window-item>
     </v-window>
@@ -96,7 +96,19 @@ export default {
           sortable: false,
         }
       ],
-      items: []
+      items: [],
+      colorPallete: [
+        '#4285F4', // Blue
+        '#DB4437', // Red
+        '#F4B400', // Yellow
+        '#0F9D58', // Green
+        '#AB47BC', // Purple
+        '#FF7043', // Orange
+        '#9E9E9E', // Grey
+        '#00ACC1', // Teal
+        '#5C6BC0', // Indigo
+        '#FF9800'  // Amber
+      ]
     }
   },
   computed: {
@@ -106,22 +118,27 @@ export default {
         datasets: [{
           label: 'My First Dataset',
           data: this.items.map(item => item.value),
-          backgroundColor: [
-            '#4285F4', // Blue
-            '#DB4437', // Red
-            '#F4B400', // Yellow
-            '#0F9D58', // Green
-            '#AB47BC', // Purple
-            '#FF7043', // Orange
-            '#9E9E9E', // Grey
-            '#00ACC1', // Teal
-            '#5C6BC0', // Indigo
-            '#FF9800'  // Amber
-          ],
+          backgroundColor: this.colorPallete,
           hoverOffset: 4
         }]
       }
     },
+    barChartData() {
+      let transformedData = {
+        labels: this.items.map(item => item.category),
+        datasets: [],
+      }
+      this.items.forEach((item, index) => {
+        transformedData.datasets.push({
+          label: [item.category],
+          data: Array.from({length: this.items.length}, (_, i) => (i === index ? item.value : null)),
+          backgroundColor: this.colorPallete[index % this.colorPallete.length],
+          hoverOffset: 4,
+          skipNull: true,
+        })
+      })
+      return transformedData
+    }
   },
   watch: {
     items: {
