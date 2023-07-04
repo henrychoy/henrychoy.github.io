@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="max-width: 100%">
     <v-row justify="center" class="mb-5">
       <v-tabs
         v-model="tab"
@@ -11,23 +11,48 @@
         <v-tab value="Bar">Bar</v-tab>
       </v-tabs>
     </v-row>
-    <v-window v-if="items.length > 0" v-model="tab">
-      <v-window-item value="Donut">
-        <Doughnut
-          :data="chartData"
-        />
-      </v-window-item>
-      <v-window-item value="Pie">
-        <Pie
-          :data="chartData"
-        />
-      </v-window-item>
-      <v-window-item value="Bar">
-        <Bar
-          :data="barChartData"
-        />
-      </v-window-item>
-    </v-window>
+    <v-row v-resize="onResize">
+      <v-col class="py-1" :cols="mobile ? 12 : 6">
+        <v-window v-if="items.length > 0" v-model="tab">
+          <v-window-item value="Donut" style="height:50vh">
+            <Doughnut
+              :data="chartData"
+              :options="options"
+            />
+          </v-window-item>
+          <v-window-item value="Pie" style="height:50vh">
+            <Pie
+              :data="chartData"
+              :options="options"
+            />
+          </v-window-item>
+          <v-window-item value="Bar" style="height:50vh">
+            <Bar
+              :data="barChartData"
+              :options="options"
+            />
+          </v-window-item>
+        </v-window>
+      </v-col>
+      <v-col v-if="!mobile" class="py-0" :cols="mobile ? 0 : 6">
+        <v-data-table
+          v-model:items-per-page="itemsPerPage"
+          :headers="headers"
+          :items="items"
+          item-value="name"
+          class="elevation-1 text-left"
+          density="compact"
+        >
+          <template #[`item.percent`]="{ item }">
+            <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
+          </template>
+          <template #[`item.actions`]="{ item }">
+            <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
+            <v-icon @click="deleteItem(item.index)" class="ml-3">fa-regular fa-trash-can</v-icon>
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
     <v-row justify="space-around" class="mt-5">
       <v-btn variant="outlined" color="secondary" class="mb-3 ml-3" @click="loadExample()">
         Example
@@ -42,7 +67,7 @@
         <i class="fa-solid fa-plus ml-1" />
       </v-btn>
     </v-row>
-    <v-row>
+    <v-row class="hidden-sm-and-up">
       <v-data-table
         v-model:items-per-page="itemsPerPage"
         :headers="headers"
@@ -116,7 +141,15 @@ export default {
         '#00ACC1', // Teal
         '#5C6BC0', // Indigo
         '#FF9800'  // Amber
-      ]
+      ],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      },
+      windowSize: {
+        x: 0,
+        y: 0,
+      },
     }
   },
   computed: {
@@ -149,6 +182,9 @@ export default {
     },
     total() {
       return this.items.reduce((total, item) => total + item.value, 0)
+    },
+    mobile() {
+      return this.windowSize.x < 600
     }
   },
   watch: {
@@ -161,6 +197,7 @@ export default {
   },
   mounted() {
     this.items = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    this.onResize()
   },
   methods: {
     addItem(item) {
@@ -191,7 +228,10 @@ export default {
         {category: 'Education', value: 102},
       ])
       console.log('items = ', this.items);
-    }
+    },
+    onResize () {
+      this.windowSize = { x: window.innerWidth, y: window.innerHeight }
+    },
   }
 }
 </script>
