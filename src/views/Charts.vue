@@ -40,7 +40,7 @@
           :headers="headers"
           :items="items"
           item-value="name"
-          class="elevation-1 text-left"
+          class="text-left"
           density="compact"
         >
           <template #[`item.percent`]="{ item }">
@@ -48,7 +48,7 @@
           </template>
           <template #[`item.actions`]="{ item }">
             <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
-            <v-icon @click="deleteItem(item.index)" class="ml-3">fa-regular fa-trash-can</v-icon>
+            <v-icon class="ml-3" @click="deleteItem(item.index)">fa-regular fa-trash-can</v-icon>
           </template>
         </v-data-table>
       </v-col>
@@ -73,7 +73,7 @@
         :headers="headers"
         :items="items"
         item-value="name"
-        class="elevation-1 text-left"
+        class="text-left"
         density="compact"
       >
         <template #[`item.percent`]="{ item }">
@@ -81,7 +81,7 @@
         </template>
         <template #[`item.actions`]="{ item }">
           <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
-          <v-icon @click="deleteItem(item.index)" class="ml-3">fa-regular fa-trash-can</v-icon>
+          <v-icon class="ml-3" @click="deleteItem(item.index)">fa-regular fa-trash-can</v-icon>
         </template>
       </v-data-table>
     </v-row>
@@ -105,7 +105,7 @@ export default {
       dialog: false,
       tab: null,
       edit: {},
-      itemsPerPage: 5,
+      itemsPerPage: 10,
       headers: [
         {
           title: 'Category',
@@ -181,7 +181,7 @@ export default {
       return transformedData
     },
     total() {
-      return this.items.reduce((total, item) => total + item.value, 0)
+      return this.items.reduce((total, item) => total + Number(item.value), 0)
     },
     mobile() {
       return this.windowSize.x < 600

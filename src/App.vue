@@ -1,22 +1,26 @@
 <template>
   <v-app>
-    <v-app-bar
-      color="primary"
-      density="compact"
-    >
-      <template #prepend>
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      </template>
+    <v-container>
+      <v-row>
+        <v-app-bar
+          color="primary"
+          density="compact"
+        >
+          <template #prepend>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+          </template>
 
-      <v-app-bar-title>{{ $route.name }}</v-app-bar-title>
+          <v-app-bar-title>{{ $route.name }}</v-app-bar-title>
 
-      <template #append>
-        <v-switch 
-          :label="`${theme.global.name.value[0].toUpperCase() + theme.global.name.value.substring(1)} Mode`"
-          class="mt-5" @click="toggleTheme" 
-        />
-      </template>
-    </v-app-bar>
+          <template #append>
+            <v-switch 
+              :label="`${theme.global.name.value[0].toUpperCase() + theme.global.name.value.substring(1)} Mode`"
+              class="mt-5" @click="toggleTheme" 
+            />
+          </template>
+        </v-app-bar>
+      </v-row>
+    </v-container>
     <v-navigation-drawer
       v-model="drawer"
       temporary
@@ -28,8 +32,7 @@
         <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" />
         <v-list-item to="/charts" prepend-icon="fa-solid fa-chart-line" title="Charts" />
       </v-list>
-    </v-navigation-drawer>
-    <br><br><br>
+    </v-navigation-drawer>\
     <router-view />
   </v-app>
 </template>
