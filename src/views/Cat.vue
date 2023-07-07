@@ -7,7 +7,7 @@
         :items="animals"
         density="compact"
         variant="outlined"
-        class="container d-inline-flex"
+        class="d-inline-flex"
         :prepend-inner-icon="icon"
       />
     </h1>
@@ -149,9 +149,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.container {
-  max-width: 150px;
-}
-</style>

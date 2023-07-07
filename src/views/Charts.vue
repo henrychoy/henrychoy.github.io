@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 100%">
-    <v-row justify="center" class="mb-5">
+    <v-row justify="center">
       <v-tabs
         v-model="tab"
         bg-color="primary"

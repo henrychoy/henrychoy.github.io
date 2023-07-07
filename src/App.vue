@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-container>
+    <v-container class="mb-5">
       <v-row>
         <v-app-bar
           color="primary"
@@ -32,7 +32,7 @@
         <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" />
         <v-list-item to="/charts" prepend-icon="fa-solid fa-chart-line" title="Charts" />
       </v-list>
-    </v-navigation-drawer>\
+    </v-navigation-drawer>
     <router-view />
   </v-app>
 </template>
