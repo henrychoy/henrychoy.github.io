@@ -1,18 +1,29 @@
 <template>
   <v-container>
-    <v-textarea 
-      v-model="displayedQuestion"
-      variant="outlined" 
-      :readonly="true"
-    />
+    <div style="position: relative;">
+      <v-textarea
+        v-model="displayedQuestion"
+        variant="outlined"
+        :readonly="true"
+      />
+      <v-icon
+        icon="fa-solid fa-copy"
+        style="position: absolute; bottom: 23px; right: 4px; margin: 10px;"
+        @click="copyURL"
+      />
+    </div>
     <v-btn class="mt-3" variant="outlined" @click="getQuestion()">Get Random Question</v-btn>
   </v-container>
+  <v-snackbar v-model="copyToast" :timeout="1000" color="green">
+    Copy Successful!
+  </v-snackbar>
 </template>
 
 <script>
 export default {
   data: () => ({
     displayedQuestion: '',
+    copyToast: false,
     questions: [
     "What have you created that you are most proud of?", 
     "What's the best thing you got from one of your parents?", 
@@ -166,7 +177,11 @@ export default {
   methods: {
     getQuestion() {
       this.displayedQuestion = this.questions[Math.floor(Math.random()*this.questions.length)]
-    }
+    },
+    copyURL() {
+      navigator.clipboard.writeText(this.displayedQuestion);
+      this.copyToast = true
+    },
   }
 }
 </script>
