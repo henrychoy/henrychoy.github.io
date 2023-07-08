@@ -47,7 +47,7 @@
 <script>
 
 export default {
-  name: 'PetsP',
+  name: 'Pets',
   data: () => ({
     image: null,
     loading: true,
@@ -55,6 +55,7 @@ export default {
     animals: ['Cat', 'Dog', 'Fox', 'Bird'],
     selected: 'Cat',
     copyToast: false,
+    pauseGetPic: false,
   }),
   computed: {
     endpoint() {
@@ -83,18 +84,20 @@ export default {
   },
   watch: {
     selected() {
-      this.getPic()
+      if (!this.pauseGetPic) this.getPic()
       if (!this.queryStringsProvided) {
         this.getFact()
       }
       localStorage.setItem('animal', JSON.stringify(this.selected))
+      this.pauseGetPic = false
     }
   },
   mounted() {
     if (this.queryStringsProvided) {
       console.log('this.$route.query.animal = ', this.$route.query.animal);
       console.log('this.$route.query.img = ', this.$route.query.img);
-      // this.selected = this.$route.query.animal
+      this.pauseGetPic = true
+      this.selected = this.$route.query.animal
       this.image = this.$route.query.img
     } else {
       this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
