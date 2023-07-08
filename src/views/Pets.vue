@@ -20,7 +20,7 @@
       class="mt-15 mb-3"
     />
     <p v-if="loading">Generating {{ selected }}, please stand by...</p>
-    <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="clearQueryStrings(); getCat(); getFact()" @load="loading=false">
+    <img v-show="!loading" :src="image" alt="" style="object-fit: contain; max-width: 100vw;" @click="clearQueryStrings(); getPic(); getFact()" @load="loading=false">
     <p v-show="!loading && selected !== 'Fox' && selected !== 'Bird' && !queryStringsProvided" class="mt-1 px-3"> {{ selected }} Fact: {{ fact }} </p>
   </div>
   <v-container class="mt-5">
@@ -47,7 +47,7 @@
 <script>
 
 export default {
-  name: 'Cat',
+  name: 'PetsP',
   data: () => ({
     image: null,
     loading: true,
@@ -75,7 +75,7 @@ export default {
       return 'fa-brands fa-firefox-browser'
     },
     shareURL() {
-      return `https://www.henrychoy.com/cat?animal=${this.selected}&img=${this.image}`
+      return `https://www.henrychoy.com/pets?animal=${this.selected}&img=${this.image}`
     },
     queryStringsProvided() {
       return (this.$route.query.animal !== undefined && this.$route.query.img !== undefined)
@@ -83,7 +83,7 @@ export default {
   },
   watch: {
     selected() {
-      this.getCat()
+      this.getPic()
       if (!this.queryStringsProvided) {
         this.getFact()
       }
@@ -98,19 +98,20 @@ export default {
       this.image = this.$route.query.img
     } else {
       this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
-      this.getCat()
+      this.getPic()
       this.getFact()
     }
   },
   methods: {
-    getCat() {
+    getPic() {
+      console.log('getPic running..............')
       this.image = null
       this.loading = true
       fetch(this.endpoint)
       .then(res => res.json())
       .then(data => {
         if ( this.selected === 'Dog' && data.url.includes( '.mp4' ) ) {
-				  this.getCat();
+				  this.getPic();
 			  }
         this.image = this.getImgURL(data)
         console.log('image = ', this.image)
@@ -143,7 +144,6 @@ export default {
     clearQueryStrings() {
       if (this.queryStringsProvided) {
         window.location.href = window.location.href.split('?')[0]
-        // this.$router.push('/cat')
       }
     }
   }
