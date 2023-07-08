@@ -26,11 +26,11 @@
       temporary
     >
       <v-list>
-        <v-list-item to="/" prepend-icon="fa-solid fa-house" title="Home" />
-        <v-list-item to="/pets" prepend-icon="fa-solid fa-cat" title="Pets" />
-        <v-list-item to="/todo" prepend-icon="fa-solid fa-list-check" title="ToDo" />
-        <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" />
-        <v-list-item to="/charts" prepend-icon="fa-solid fa-chart-line" title="Charts" />
+        <v-list-item to="/" prepend-icon="fa-solid fa-house" title="Home" @click="drawer = false" />
+        <v-list-item to="/pets" prepend-icon="fa-solid fa-cat" title="Pets" @click="drawer = false" />
+        <v-list-item to="/todo" prepend-icon="fa-solid fa-list-check" title="ToDo" @click="drawer = false" />
+        <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" @click="drawer = false" />
+        <v-list-item to="/charts" prepend-icon="fa-solid fa-chart-line" title="Charts" @click="drawer = false" />
       </v-list>
     </v-navigation-drawer>
     <router-view />
