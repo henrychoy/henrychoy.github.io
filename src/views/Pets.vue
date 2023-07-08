@@ -100,7 +100,10 @@ export default {
       this.selected = this.$route.query.animal
       this.image = this.$route.query.img
     } else {
-      this.selected = JSON.parse(localStorage.getItem('animal')) || 'Cat'
+      const savedAnimal = JSON.parse(localStorage.getItem('animal'))
+      // to prevent double loading when mounted
+      if (savedAnimal && savedAnimal !== 'Cat') this.pauseGetPic = true
+      this.selected = savedAnimal || 'Cat'
       this.getPic()
       this.getFact()
     }
