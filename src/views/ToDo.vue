@@ -36,10 +36,17 @@
     data: () => ({
       task: '',
       items: [],
+      overrideConfetti: true
     }),
     computed: {
       done() {
         return this.items.filter(item => item.done).length
+      },
+      confettiSettings() {
+        return {
+          particleCount: this.$vuetify.display.mobile ? 80 : 150,
+          spread: this.$vuetify.display.mobile ? 45 : 120,
+        }
       }
     },
     watch: {
@@ -47,7 +54,15 @@
         handler(newVal) {
           console.log('saving to local ', newVal)
           localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal));
-          if (this.calcProgress() === 100) confetti({particleCount: 100, origin: { y: 0.7 }, startVelocity: 55,})
+          if (this.calcProgress() === 100 && !this.overrideConfetti) {
+            confetti({
+              particleCount: this.confettiSettings.particleCount,
+              startVelocity: 55,
+              spread: this.confettiSettings.spread,
+              origin: { y: 0.7 },
+            })
+          }
+          this.overrideConfetti = false
         },
         deep: true
       }
@@ -67,6 +82,7 @@
         this.task = ''
       },
       deleteTask(index){
+        this.overrideConfetti = true
         this.items.splice(index, 1)
       },
       calcProgress() {
