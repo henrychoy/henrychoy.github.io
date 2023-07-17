@@ -29,7 +29,9 @@
 </template>
 
 <script>
+  import confetti from "canvas-confetti";
   const STORAGE_KEY = 'todo-storage';
+
   export default {
     data: () => ({
       task: '',
@@ -45,6 +47,7 @@
         handler(newVal) {
           console.log('saving to local ', newVal)
           localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal));
+          if (this.calcProgress() === 100) confetti({particleCount: 100, origin: { y: 0.7 }, startVelocity: 55,})
         },
         deep: true
       }
