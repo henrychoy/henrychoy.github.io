@@ -98,7 +98,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, Title, BarElement, CategoryScale, 
 const STORAGE_KEY = 'chart-storage';
 
 export default {
-  name: 'Charts',
+  name: 'Expenses',
   components: { VDataTable, AddItemDialog, Doughnut, Pie, Bar },
   data() {
     return {

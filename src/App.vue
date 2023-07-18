@@ -30,7 +30,7 @@
         <v-list-item to="/pets" prepend-icon="fa-solid fa-cat" title="Pets" @click="drawer = false" />
         <v-list-item to="/todo" prepend-icon="fa-solid fa-list-check" title="ToDo" @click="drawer = false" />
         <v-list-item to="/questions" prepend-icon="fa-solid fa-question" title="Questions" @click="drawer = false" />
-        <v-list-item to="/charts" prepend-icon="fa-solid fa-chart-line" title="Charts" @click="drawer = false" />
+        <v-list-item to="/expenses" prepend-icon="fa-solid fa-chart-line" title="Expenses" @click="drawer = false" />
       </v-list>
     </v-navigation-drawer>
     <router-view />

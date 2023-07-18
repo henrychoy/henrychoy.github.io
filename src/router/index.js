@@ -3,7 +3,7 @@ import Home from '../views/Home.vue'
 import Pets from '../views/Pets.vue'
 import ToDo from '../views/ToDo.vue'
 import Questions from '../views/Questions.vue'
-import Charts from '../views/Charts.vue'
+import Expenses from '../views/Expenses.vue'
 
 const routes = [
   {
@@ -27,9 +27,9 @@ const routes = [
     component: Questions
   },
   {
-    path: '/charts',
-    name: 'Charts',
-    component: Charts
+    path: '/expenses',
+    name: 'Expenses',
+    component: Expenses
   },
 
 ]
