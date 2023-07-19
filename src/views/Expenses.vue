@@ -200,11 +200,20 @@ export default {
     this.onResize()
   },
   methods: {
-    addItem(item) {
-      this.items.push({
-        category: item.category,
-        value: item.value
+    addItem(newExpense) {
+      let match = false
+      this.items.forEach((expense) =>{
+        if (expense.category === newExpense.category) {
+          expense.value = parseInt(expense.value) + parseInt(newExpense.value)
+          match = true
+        }
       })
+      if (!match) {
+        this.items.push({
+          category: newExpense.category,
+          value: newExpense.value
+        })
+      }
     },
     editItem(item) {
       this.items[item.index] = { category: item.category, value: item.value }

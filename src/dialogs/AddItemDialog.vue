@@ -14,8 +14,14 @@
         />
         <v-card-text>
           <v-form ref="form" @submit.prevent>
-            <v-text-field
+            <!-- <v-text-field
               v-model="category"
+              :rules="rules"
+              label="Category"
+            /> -->
+            <v-select
+              v-model="category"
+              :items="categories"
               :rules="rules"
               label="Category"
             />
@@ -49,7 +55,8 @@
     data() {
       return {
         category: '',
-        value: '',
+        categories: ['Housing', 'Transportation', 'Food', 'Insurance', 'Healthcare', 'Utilities', 'Entertainment', 'Other'],
+        value: 0,
         rules: [
           value => {
             if (value) return true
@@ -58,7 +65,7 @@
         ],
         rulesNumerical: [
           value => {
-            if (!isNaN(parseFloat(value))) return true
+            if (!isNaN(value)) return true
             return 'Value must be a numerical value'
           },
         ],
