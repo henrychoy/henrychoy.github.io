@@ -55,18 +55,18 @@
           <template #[`expanded-row`]="{ columns, item }">
             <tr v-for="(lineItem, lineItemIndex) in item.raw.lineItems" :key="lineItem" :colspan="columns.length">
               <td>
-                <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}:
+                <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}
               </td>
-              <td>
+              <td class="text-right">
                 {{ lineItem.value }}
               </td>
-              <td>
+              <td class="text-right">
                 <v-chip>{{ (lineItem.value/grandTotal * 100).toFixed(0) }}%</v-chip>
               </td>
               <td>
                 <v-icon class="ml-3" @click="deleteLineItem(item.index, lineItemIndex)">fa-regular fa-trash-can</v-icon>
               </td>
-              <td>
+              <td class="text-center">
                 <v-icon @click="edit={...item, lineItemIndex}; dialog=true">fa-regular fa-pen-to-square</v-icon>
               </td>
             </tr>
