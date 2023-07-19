@@ -269,6 +269,11 @@ export default {
     editItem(item) {
       console.log('editItem...', item)
       this.items[item.index].lineItems[item.lineItemIndex] = { category: item.category, value: item.value, description: item.description }
+      let categoryTotal = 0
+      this.items[item.index].lineItems.forEach((lineItem) => {
+        categoryTotal = parseInt(categoryTotal) + parseInt(lineItem.value)
+      })
+      this.items[item.index].value = categoryTotal
       this.edit = {}
     },
     deleteItem(index) {
@@ -284,16 +289,16 @@ export default {
     loadExample() {
       // https://www.ramseysolutions.com/budgeting/american-average-monthly-expenses#:~:text=There%20are%20folks%20at%20the,income%20of%20%2478%2C743%20after%20taxes.
       this.items = this.items.concat([
-        {category: 'Housing', value: 1885},
-        {category: 'Transportation', value: 913},
-        {category: 'Food', value: 691},
-        {category: 'Insurance', value: 656},
-        {category: 'Healthcare', value: 454},
-        {category: 'Entertainment', value: 297},
-        {category: 'Other', value: 234},
-        {category: 'Charity', value: 201},
-        {category: 'Clothes', value: 146},
-        {category: 'Education', value: 102},
+        {category: 'Housing', value: 1885, lineItems: [{description: 'Rent', value: 1885}]},
+        {category: 'Transportation', value: 913, lineItems: [{description: 'Car', value: 913}]},
+        {category: 'Food', value: 691, lineItems: [{description: 'Groceries', value: 691}]},
+        {category: 'Insurance', value: 656, lineItems: [{description: 'Monthly payment', value: 656}]},
+        {category: 'Healthcare', value: 454, lineItems: [{description: 'Monthly payment', value: 454}]},
+        {category: 'Entertainment', value: 297, lineItems: [{description: 'Vacation', value: 297}]},
+        {category: 'Other', value: 234, lineItems: [{description: 'Toys', value: 234}]},
+        {category: 'Charity', value: 201, lineItems: [{description: 'Donations', value: 201}]},
+        {category: 'Clothes', value: 146, lineItems: [{description: 'Pants', value: 146}]},
+        {category: 'Education', value: 102, lineItems: [{description: 'Online Class', value: 102}]},
       ])
       console.log('items = ', this.items);
     },
