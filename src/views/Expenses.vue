@@ -239,6 +239,11 @@ export default {
   watch: {
     items: {
       handler(newVal) {
+        this.items.forEach((item, index) => {
+          if (item.lineItems.length === 0) {
+            this.deleteItem(index)
+          }
+        })
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newVal));
       },
       deep: true
@@ -267,8 +272,12 @@ export default {
       }
     },
     editItem(item) {
-      console.log('editItem...', item)
-      this.items[item.index].lineItems[item.lineItemIndex] = { category: item.category, value: item.value, description: item.description }
+      if (item.category !== this.items[item.index].category) {
+        this.items[item.index].lineItems.splice(item.lineItemIndex, 1)
+        this.addItem(item)
+      } else {
+        this.items[item.index].lineItems[item.lineItemIndex] = { category: item.category, value: item.value, description: item.description }
+      }
       let categoryTotal = 0
       this.items[item.index].lineItems.forEach((lineItem) => {
         categoryTotal = parseInt(categoryTotal) + parseInt(lineItem.value)
@@ -282,9 +291,6 @@ export default {
     deleteLineItem(index, lineItemIndex) {
       this.items[index].value -= this.items[index].lineItems[lineItemIndex].value
       this.items[index].lineItems.splice(lineItemIndex, 1)
-      if (this.items[index].lineItems.length === 0) {
-        this.deleteItem(index)
-      }
     },
     loadExample() {
       // https://www.ramseysolutions.com/budgeting/american-average-monthly-expenses#:~:text=There%20are%20folks%20at%20the,income%20of%20%2478%2C743%20after%20taxes.
