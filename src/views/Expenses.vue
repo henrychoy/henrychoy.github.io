@@ -37,18 +37,39 @@
       <v-col v-if="!mobile" class="py-0" :cols="mobile ? 0 : 6">
         <v-data-table
           v-model:items-per-page="itemsPerPage"
+          v-model:expanded="expanded"
           :headers="headers"
           :items="items"
-          item-value="name"
+          item-value="category"
           class="text-left"
           density="compact"
+          show-expand
         >
           <template #[`item.percent`]="{ item }">
             <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
           </template>
           <template #[`item.actions`]="{ item }">
-            <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
+            <!-- <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon> -->
             <v-icon class="ml-3" @click="deleteItem(item.index)">fa-regular fa-trash-can</v-icon>
+          </template>
+          <template #[`expanded-row`]="{ columns, item }">
+            <tr v-for="(lineItem, lineItemIndex) in item.raw.lineItems" :key="lineItem" :colspan="columns.length">
+              <td>
+                <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}:
+              </td>
+              <td>
+                {{ lineItem.value }}
+              </td>
+              <td>
+                <v-chip>{{ (lineItem.value/total * 100).toFixed(0) }}%</v-chip>
+              </td>
+              <td>
+                <v-icon class="ml-3" @click="deleteLineItem(item.index, lineItemIndex)">fa-regular fa-trash-can</v-icon>
+              </td>
+              <td>
+                <v-icon @click="edit={...item, lineItemIndex}; dialog=true">fa-regular fa-pen-to-square</v-icon>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-col>
@@ -70,18 +91,39 @@
     <v-row class="hidden-sm-and-up">
       <v-data-table
         v-model:items-per-page="itemsPerPage"
+        v-model:expanded="expanded"
         :headers="headers"
         :items="items"
-        item-value="name"
+        item-value="category"
         class="text-left"
         density="compact"
+        show-expand
       >
         <template #[`item.percent`]="{ item }">
           <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
         </template>
         <template #[`item.actions`]="{ item }">
-          <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon>
+          <!-- <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon> -->
           <v-icon class="ml-3" @click="deleteItem(item.index)">fa-regular fa-trash-can</v-icon>
+        </template>
+        <template #[`expanded-row`]="{ columns, item }">
+          <tr v-for="(lineItem, lineItemIndex) in item.raw.lineItems" :key="lineItem" :colspan="columns.length">
+            <td>
+              <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}:
+            </td>
+            <td>
+              {{ lineItem.value }}
+            </td>
+            <td>
+              <v-chip>{{ (lineItem.value/total * 100).toFixed(0) }}%</v-chip>
+            </td>
+            <td>
+              <v-icon class="ml-3" @click="deleteLineItem(item.index, lineItemIndex)">fa-regular fa-trash-can</v-icon>
+            </td>
+            <td>
+              <v-icon @click="edit={...item, lineItemIndex}; dialog=true">fa-regular fa-pen-to-square</v-icon>
+            </td>
+          </tr>
         </template>
       </v-data-table>
     </v-row>
@@ -106,6 +148,7 @@ export default {
       tab: null,
       edit: {},
       itemsPerPage: 10,
+      expanded: [],
       headers: [
         {
           title: 'Category',
@@ -205,22 +248,32 @@ export default {
       this.items.forEach((expense) =>{
         if (expense.category === newExpense.category) {
           expense.value = parseInt(expense.value) + parseInt(newExpense.value)
+          expense.lineItems.push({description: newExpense.description, value: newExpense.value})
           match = true
         }
       })
       if (!match) {
         this.items.push({
           category: newExpense.category,
-          value: newExpense.value
+          value: newExpense.value,
+          lineItems: [{description: newExpense.description, value: newExpense.value}]
         })
       }
     },
     editItem(item) {
-      this.items[item.index] = { category: item.category, value: item.value }
+      console.log('editItem...', item)
+      this.items[item.index].lineItems[item.lineItemIndex] = { category: item.category, value: item.value, description: item.description }
       this.edit = {}
     },
     deleteItem(index) {
       this.items.splice(index, 1)
+    },
+    deleteLineItem(index, lineItemIndex) {
+      this.items[index].value -= this.items[index].lineItems[lineItemIndex].value
+      this.items[index].lineItems.splice(lineItemIndex, 1)
+      if (this.items[index].lineItems.length === 0) {
+        this.deleteItem(index)
+      }
     },
     loadExample() {
       // https://www.ramseysolutions.com/budgeting/american-average-monthly-expenses#:~:text=There%20are%20folks%20at%20the,income%20of%20%2478%2C743%20after%20taxes.

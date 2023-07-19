@@ -14,11 +14,10 @@
         />
         <v-card-text>
           <v-form ref="form" @submit.prevent>
-            <!-- <v-text-field
-              v-model="category"
-              :rules="rules"
-              label="Category"
-            /> -->
+            <v-text-field
+              v-model="description"
+              label="Description (optional)"
+            />
             <v-select
               v-model="category"
               :items="categories"
@@ -30,7 +29,7 @@
               :rules="rulesNumerical"
               label="Value"
             />
-            <v-btn type="submit" block class="mt-2" @click="submitForm(category, value, index)">Submit</v-btn>
+            <v-btn type="submit" block class="mt-2" @click="submitForm(category, value, description, index, lineItemIndex)">Submit</v-btn>
           </v-form>
         </v-card-text>
         <!-- <v-card-actions class="justify-end">
@@ -57,6 +56,7 @@
         category: '',
         categories: ['Housing', 'Transportation', 'Food', 'Insurance', 'Healthcare', 'Utilities', 'Entertainment', 'Other'],
         value: 0,
+        description: '',
         rules: [
           value => {
             if (value) return true
@@ -82,20 +82,24 @@
       },
       index() {
         return Object.keys(this.edit).length === 0 ? null : this.edit.index
+      },
+      lineItemIndex() {
+        return this.edit.lineItemIndex
       }
     },
     updated() {
       this.category = Object.keys(this.edit).length > 0 ? this.edit.columns.category : ''
-      this.value = Object.keys(this.edit).length > 0 ? this.edit.columns.value : ''
+      this.value = this.edit.raw?.lineItems[this.edit.lineItemIndex].value
+      this.description = this.edit.raw?.lineItems[this.edit.lineItemIndex].description
     },
     methods: {
-      async submitForm(category, value, index) {
+      async submitForm(category, value, description, index, lineItemIndex) {
         const { valid } = await this.$refs.form.validate()
         if (valid) {
           if(Object.keys(this.edit).length === 0) {
-            this.$emit('submit', { category, value });
+            this.$emit('submit', { category, value, description });
           } else {
-            this.$emit('editItem', { category, value, index });
+            this.$emit('editItem', { category, value, description, index, lineItemIndex });
           }
           this.$refs.form.reset()
           this.$emit('close', true);
