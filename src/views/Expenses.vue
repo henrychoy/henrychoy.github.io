@@ -46,7 +46,7 @@
           show-expand
         >
           <template #[`item.percent`]="{ item }">
-            <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
+            <v-chip>{{ (item.columns.value/grandTotal * 100).toFixed(0) }}%</v-chip>
           </template>
           <template #[`item.actions`]="{ item }">
             <!-- <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon> -->
@@ -61,7 +61,7 @@
                 {{ lineItem.value }}
               </td>
               <td>
-                <v-chip>{{ (lineItem.value/total * 100).toFixed(0) }}%</v-chip>
+                <v-chip>{{ (lineItem.value/grandTotal * 100).toFixed(0) }}%</v-chip>
               </td>
               <td>
                 <v-icon class="ml-3" @click="deleteLineItem(item.index, lineItemIndex)">fa-regular fa-trash-can</v-icon>
@@ -100,7 +100,7 @@
         show-expand
       >
         <template #[`item.percent`]="{ item }">
-          <v-chip>{{ (item.columns.value/total * 100).toFixed(0) }}%</v-chip>
+          <v-chip>{{ (item.columns.value/grandTotal * 100).toFixed(0) }}%</v-chip>
         </template>
         <template #[`item.actions`]="{ item }">
           <!-- <v-icon @click="edit=item; dialog=true">fa-regular fa-pen-to-square</v-icon> -->
@@ -109,18 +109,18 @@
         <template #[`expanded-row`]="{ columns, item }">
           <tr v-for="(lineItem, lineItemIndex) in item.raw.lineItems" :key="lineItem" :colspan="columns.length">
             <td>
-              <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}:
+              <span>&bull;</span> {{ lineItem.description || `Expense #${lineItemIndex + 1}` }}
             </td>
-            <td>
+            <td class="text-right">
               {{ lineItem.value }}
             </td>
-            <td>
-              <v-chip>{{ (lineItem.value/total * 100).toFixed(0) }}%</v-chip>
+            <td class="text-right">
+              <v-chip>{{ (lineItem.value/grandTotal * 100).toFixed(0) }}%</v-chip>
             </td>
             <td>
               <v-icon class="ml-3" @click="deleteLineItem(item.index, lineItemIndex)">fa-regular fa-trash-can</v-icon>
             </td>
-            <td>
+            <td class="text-center">
               <v-icon @click="edit={...item, lineItemIndex}; dialog=true">fa-regular fa-pen-to-square</v-icon>
             </td>
           </tr>
@@ -158,12 +158,12 @@ export default {
         {
           title: 'Value',
           key: 'value',
-          align: 'start'
+          align: 'end'
         },
         {
           title: 'Percent',
           key: 'percent',
-          align: 'start',
+          align: 'end',
         },
         {
           title: '',
@@ -223,8 +223,14 @@ export default {
       })
       return transformedData
     },
-    total() {
-      return this.items.reduce((total, item) => total + Number(item.value), 0)
+    grandTotal() {
+      let total = 0
+      this.items.forEach((item) => {
+        item.lineItems.forEach((lineItem) => {
+          total = parseInt(total) + parseInt(lineItem.value)
+        })
+      })
+      return total
     },
     mobile() {
       return this.windowSize.x < 600
