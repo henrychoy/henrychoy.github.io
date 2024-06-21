@@ -52,8 +52,8 @@ export default {
     image: null,
     loading: true,
     fact: '',
-    animals: ['Cat', 'Dog', 'Fox'],
-    selected: 'Cat',
+    animals: ['Dog', 'Cat', 'Fox'],
+    selected: 'Dog',
     copyToast: false,
     pauseGetPic: false,
   }),
@@ -102,8 +102,8 @@ export default {
     } else {
       const savedAnimal = JSON.parse(localStorage.getItem('animal'))
       // to prevent double loading when mounted
-      if (savedAnimal && savedAnimal !== 'Cat') this.pauseGetPic = true
-      this.selected = savedAnimal || 'Cat'
+      if (savedAnimal && savedAnimal !== 'Dog') this.pauseGetPic = true
+      this.selected = savedAnimal || 'Dog'
       this.getPic()
       this.getFact()
     }
@@ -113,35 +113,18 @@ export default {
       console.log('getPic running..............')
       this.image = null
       this.loading = true
-
-      const fetchWithTimeout = (url, options, timeout = 3000) => {
-        return Promise.race([
-          fetch(url, options),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Request timed out')), timeout)
-          )
-        ])
-      }
-
-      const fetchImage = () => {
-        fetchWithTimeout(this.endpoint)
-          .then(res => res.json())
-          .then(data => {
-            if (this.selected === 'Dog' && data.url.includes('.mp4')) {
-              fetchImage();
-            } else {
-              this.image = this.getImgURL(data)
-              console.log('image = ', this.image)
-            }
-          })
-          .catch(err => {
-            console.warn(err);
-            if (err.message === 'Request timed out') {
-              fetchImage()
-            }
-          })
-      }
-      fetchImage()
+      fetch(this.endpoint)
+      .then(res => res.json())
+      .then(data => {
+        if ( this.selected === 'Dog' && (data.url.includes( '.mp4' ) || data.url.includes( '.webm' )) ) {
+				  this.getPic();
+			  }
+        this.image = this.getImgURL(data)
+        console.log('image = ', this.image)
+      })
+      .catch(err => {
+          console.warn(err)
+      })
     },
     getFact() {
       if (this.selected === 'Fox' || this.selected === 'Bird') return
