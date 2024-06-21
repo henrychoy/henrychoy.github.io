@@ -52,7 +52,7 @@ export default {
     image: null,
     loading: true,
     fact: '',
-    animals: ['Cat', 'Dog', 'Fox', 'Bird'],
+    animals: ['Cat', 'Dog', 'Fox'],
     selected: 'Cat',
     copyToast: false,
     pauseGetPic: false,
@@ -113,18 +113,35 @@ export default {
       console.log('getPic running..............')
       this.image = null
       this.loading = true
-      fetch(this.endpoint)
-      .then(res => res.json())
-      .then(data => {
-        if ( this.selected === 'Dog' && data.url.includes( '.mp4' ) ) {
-				  this.getPic();
-			  }
-        this.image = this.getImgURL(data)
-        console.log('image = ', this.image)
-      })
-      .catch(err => {
-          console.warn(err)
-      })
+
+      const fetchWithTimeout = (url, options, timeout = 3000) => {
+        return Promise.race([
+          fetch(url, options),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), timeout)
+          )
+        ])
+      }
+
+      const fetchImage = () => {
+        fetchWithTimeout(this.endpoint)
+          .then(res => res.json())
+          .then(data => {
+            if (this.selected === 'Dog' && data.url.includes('.mp4')) {
+              fetchImage();
+            } else {
+              this.image = this.getImgURL(data)
+              console.log('image = ', this.image)
+            }
+          })
+          .catch(err => {
+            console.warn(err);
+            if (err.message === 'Request timed out') {
+              fetchImage()
+            }
+          })
+      }
+      fetchImage()
     },
     getFact() {
       if (this.selected === 'Fox' || this.selected === 'Bird') return
